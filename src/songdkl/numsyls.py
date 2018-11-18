@@ -108,7 +108,7 @@ def numsyls(path1):
     
     segedpsds,sylno_bic=EMofgmmcluster(segedpsds1)
     
-    print filename1+'\t'+str(sylno_bic)
+    print(filename1 + '\t' + str(sylno_bic))
 
 
 if __name__ == '__main__':
