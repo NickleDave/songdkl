@@ -110,9 +110,9 @@ setup(
     url=URL,
     packages=find_packages(where="src", exclude=('tests',)),
     package_dir={"": "src"},
-    scripts=['src/bin/tweetynet-cli.py'],
+    scripts=['src/bin/songdkl-cli.py'],
     entry_points={
-        'console_scripts': ['tweetynet-cli=tweetynet.__main__:main'],
+        'console_scripts': ['songdkl-cli=songdkl.__main__:main'],
     },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
