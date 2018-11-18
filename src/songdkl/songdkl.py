@@ -1,13 +1,14 @@
-import sys as sys
-import os as os
+import sys
+import os
 from glob import glob
 
+import numpy as np
 import scipy.spatial as spatial
-from pylab import specgram, psd
+from matplotlib.pylab import psd
 import numpy as np
 from sklearn.mixture import GaussianMixture as GMM
 
-from songdkl.utils import audio
+from .utils import audio
 
 """A script to calculate the song divergence between two birds. It is applied as follows:
 
@@ -43,15 +44,20 @@ this if you have low frequency noise that is differential between the tutor and 
 song and you don't want that noise incorporated into the song D_KL calculations.
 """
 
-def _get_all_syls(path, files):
+def norm(a):
+    """normalizes a string by its average and syd"""
+    a=(np.array(a) - np.average(a)) / np.std(a)
+    return a
+
+
+def _get_all_syls(files):
     """get all syllables from all .wav files in a folder
-    
+
     Parameters
     ----------
-    path : str
-        path to folder with .wav files
     files : list
-        of str, output of using glob to find all *.wav files in path
+        of str, absolute paths to .wav files
+        (output of using glob to find all *.wav files in path)
 
     Returns
     -------
@@ -61,7 +67,7 @@ def _get_all_syls(path, files):
     syls = []
     objss = []
     for file in files:
-        song = audio.impwav(path + file)
+        song = audio.impwav(file)
         if len(song[0]) < 1:
             break
         syls_this_song, objs, frq = audio.getsyls(song)
@@ -70,9 +76,9 @@ def _get_all_syls(path, files):
     return syls, objss
 
 
-def convert_syl_to_psd(syls, max_num_psds):
-    """
-    
+def convert_syl_to_psd(syls, max_num_psds, k, k2):
+    """convert syllable segments to power spectral density
+
     Parameters
     ----------
     syls : list
@@ -90,28 +96,45 @@ def convert_syl_to_psd(syls, max_num_psds):
         nfft = int(round(2**14/32000.0*fs))
         segstart = int(round(600/(fs/float(nfft))))
         segend = int(round(16000/(fs/float(nfft))))
-        psds = [psd(audio.norm(y), NFFT=nfft, Fs=fs) for y in x[1:]]
+        psds = [psd(norm(y), NFFT=nfft, Fs=fs) for y in x[1:]]
         spsds = [norm(n[0][segstart:segend]) for n in psds]
         for n in spsds:
             segedpsds.append(n)
     return segedpsds
 
 
-def calculate_songdkl(path1, path2, max_wavs=120, max_num_psds=10000):
+def compute_songdkl(path1, path2, k, k2, max_wavs=120, max_num_psds=10000):
+    """compute songdkl metric
+
+    Parameters
+    ----------
+    path1 : str
+        path to folder with .wav files of songs from bird 1
+    path2 : str
+        path to folder with .wav files of songs from bird 2
+    k : int
+        number of syllable classes in song 1
+    k2 : int
+        number of syllable classes in song 2
+    max_wavs : int
+        maximum number of wav files to use. Default is 120.
+    max_num_psds : int
+        maximum number of psds to calculate. Default is 10000
+
+    Returns
+    -------
+    None
+
+    prints estimate of song D(KL) to stdout
+    """
     fils1 = glob(os.path.join(path1, '*.wav'))
     fils2 = glob(os.path.join(path2, '*.wav'))
 
     fils1 = fils1[:max_wavs]
     fils2 = fils2[:max_wavs]
 
-    filename1 = path1.split('/')[-2]
-    filename2 = path2.split('/')[-2]
-
-    k = int(sys.argv[3]) #number of syllable classes in song 1
-    k2 = int(sys.argv[4]) #number of syllable classes in song 2
-
-    syls1, objss1 = _get_all_syls(path1, fils1) 
-    syls2, objss2 = _get_all_syls(path2, fils2)
+    syls1, objss1 = _get_all_syls(fils1) 
+    syls2, objss2 = _get_all_syls(fils2)
 
     segedpsds1 = convert_syl_to_psd(syls1, max_num_psds)
     segedpsds2 = convert_syl_to_psd(syls2, max_num_psds)
@@ -123,8 +146,8 @@ def calculate_songdkl(path1, path2, max_wavs=120, max_num_psds=10000):
 
     lone = len(segedpsds1)
     ltwo = len(segedpsds2)
-    lone_half = int(lone/2)
-    ltwo_half = int(ltwo/2)
+    lone_half = int(lone / 2)
+    ltwo_half = int(ltwo / 2)
 
     # calculate distance matrices
     d1 = spatial.distance.cdist(segedpsds1[:lone_half], basis_set, 'sqeuclidean')
@@ -132,7 +155,7 @@ def calculate_songdkl(path1, path2, max_wavs=120, max_num_psds=10000):
     d2 = spatial.distance.cdist(segedpsds2[:ltwo_half], basis_set, 'sqeuclidean')
     d2_2 = spatial.distance.cdist(segedpsds2[ltwo_half:ltwo], basis_set, 'sqeuclidean')
 
-    mx = np.max([np.max(d1),np.max(d2),np.max(d1_2),np.max(d2_2)])
+    mx = np.max([np.max(d1), np.max(d2), np.max(d1_2), np.max(d2_2)])
 
     # convert to similarity matrices
     s1 = 1 - (d1 / mx)
@@ -141,16 +164,16 @@ def calculate_songdkl(path1, path2, max_wavs=120, max_num_psds=10000):
     s2_2 = 1 - (d2_2 / mx)
 
     #estimate GMMs
-    mod1 = GMM(n_components=k,max_iter=100000,n_init=5,covariance_type='full')
+    mod1 = GMM(n_components=k, max_iter=100000, n_init=5, covariance_type='full')
     mod1.fit(s1)
 
-    mod2 = GMM(n_components=k2,max_iter=100000,n_init=5,covariance_type='full')
+    mod2 = GMM(n_components=k2, max_iter=100000, n_init=5, covariance_type='full')
     mod2.fit(s2)
 
     len2=len(s2)
     len1=len(d1)
 
-    #calculate likelihoods for held out data
+    # calculate likelihoods for held out data
     score1_1 = mod1.score(s1_2)
     score2_1 = mod2.score(s1_2)
 
@@ -160,15 +183,15 @@ def calculate_songdkl(path1, path2, max_wavs=120, max_num_psds=10000):
     len2 = float(len(basis_set))
     len1 = float(len(basis_set))
 
-    #calculate song divergence (DKL estimate)
+    # calculate song divergence (DKL estimate)
     score1 = np.log2(np.e) * ((np.mean(score1_1)) - (np.mean(score2_1)))
     score2 = np.log2(np.e) * ((np.mean(score2_2)) - (np.mean(score1_2)))
 
     score1 = score1 / len1
     score2 = score2 / len2
 
-    #output
-    print(filename1 + '\t' + filename2 + '\t' + str(k) + '\t' + str(k2) 
+    # output
+    print(path1 + '\t' + path2 + '\t' + str(k) + '\t' + str(k2) 
           + '\t' + str(len2) + '\t' + str(score1) + '\t' + str(score2)
           + '\t' + str(len(segedpsds1)) + '\t' + str(len(segedpsds2)))
 
@@ -176,4 +199,6 @@ def calculate_songdkl(path1, path2, max_wavs=120, max_num_psds=10000):
 if __name__ == '__main__':
     path1 = sys.argv[1]
     path2 = sys.argv[2]
-    calculate_songdkl(path1, path2)
+    k = int(sys.argv[3])
+    k2 = int(sys.argv[4])
+    calculate_songdkl(path1, path2, k, k2)
