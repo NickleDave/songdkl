@@ -1,21 +1,22 @@
 import numpy as np
-import scipy as sc
-
+import scipy.signal as signal
+from scipy.io import wavfile
+from scipy import ndimage
 
 def impwav(a):
     """Imports a wave file as an array where a[1] 
     is the sampling frequency and a[0] is the data"""
     out=[]
-    wav = sc.io.wavfile.read(a)
+    wav = wavfile.read(a)
     out=[wav[1],wav[0]]
     return out
 
 
 def filtersong(a):
     """highpass iir filter for song."""
-    out=[]
-    b=sc.signal.iirdesign(wp=0.04, ws=0.02, gpass=1, gstop=60,ftype='ellip')
-    out.append(sc.signal.filtfilt(b[0],b[1],a[0]))
+    out = []
+    b = signal.iirdesign(wp=0.04, ws=0.02, gpass=1, gstop=60,ftype='ellip')
+    out.append(signal.filtfilt(b[0],b[1],a[0]))
     out.append(a[1])
     return (out)
 
@@ -58,10 +59,10 @@ def threshold(a,thresh=None):
 
 def findobject(file):
     """finds objects.  Expects a smoothed rectified amplitude envelope"""
-    value=(otsu(np.array(file,dtype=np.uint32)))/2 #calculate a threshold
+    value = (otsu(np.array(file,dtype=np.uint32)))/2 #calculate a threshold
     #value=(np.average(file))/2 #heuristically, this also usually works  for establishing threshold
-    thresh=threshold(file,value) #threshold the envelope data
-    thresh=threshold(sc.ndimage.convolve(thresh,np.ones(512)),0.5) #pad the threshold
-    label=(sc.ndimage.label(thresh)[0]) #label objects in the threshold
-    objs=sc.ndimage.find_objects(label) #recover object positions
+    thresh = threshold(file,value) #threshold the envelope data
+    thresh = threshold(sc.ndimage.convolve(thresh,np.ones(512)),0.5) #pad the threshold
+    label = (ndimage.label(thresh)[0]) #label objects in the threshold
+    objs = ndimage.find_objects(label) #recover object positions
     return(objs)
