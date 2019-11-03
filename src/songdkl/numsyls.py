@@ -1,3 +1,4 @@
+"""functions to estimate the number of sylables in a bird's song"""
 import sys as sys
 import os as os
 import scipy as sc
@@ -5,19 +6,6 @@ import scipy as sc
 from pylab import specgram, psd
 import numpy as np
 from sklearn import mixture
-
-"""A script to estimate the number of syllable types in a song.
-It fitsfits a series of gaussian mixture models with an 
-increasing number of mixtures, and identifies the best number 
-of mixtures to describe the data by BIC.
-It is applied as follows:
-python calc_sylno.py folder_with_bird_songs
-e.g. python calc_sylno.py bird_data/y34br6/
-It expects the songs to be in mono wave format and have a .wav suffix.
-The output is a tab delimited string as follows:
-foldername_bird	number_of_syllables
-e.g. y34br6 9"""
-
 
 
 def chunks(l, n):
@@ -29,6 +17,7 @@ def chunks(l, n):
         out.append(l[i*n:i*n+n])
     out.append(l[lens*n:])
     return out[:-1]
+
 
 def EMofgmmcluster(array_of_syls):
     """takes an array of segmented sylables, fits a series of
@@ -50,9 +39,11 @@ def EMofgmmcluster(array_of_syls):
     segedpsds1=[norm(x[0][segstart:segend]) for x in welchpsds]
     
     models=range(2,22)
-     
-    basis_set=segedpsds1[:50] #select the first 50 syllables of the reference song as the basis set
-    #basis_set=[segedpsds1[rnd.randint(0,len(segedpsds1))] for x in range(50)] #select a random set of 50 syllablse as the basis set
+
+    # select the first 50 syllables of the reference song as the basis set
+    basis_set=segedpsds1[:50]
+    # select a random set of 50 syllablse as the basis set
+    # basis_set=[segedpsds1[rnd.randint(0,len(segedpsds1))] for x in range(50)]
     d=sc.spatial.distance.cdist(segedpsds1,basis_set,'sqeuclidean')
     s=1-d/np.max(d)*1000
     bic=[]
@@ -73,6 +64,7 @@ def EMofgmmcluster(array_of_syls):
         gmm.fit(np.array(s))
         bic.append(gmm.bic(np.array(s)))
     return segedpsds1,bic.index(min(bic))+2
+
 
 def numsyls(path1):
     fils1=[x for x in os.listdir(path1) if x[-4:]== '.wav']
