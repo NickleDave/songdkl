@@ -1,12 +1,6 @@
-"""
-Invokes songdkl.__main__.main when the module is run as a script.
-Example: python -m songdkl --help
-The same function is run by the script `songdkl-cli` which is installed on the
-path by pip, so `$ songdkl-cli --help` would have the same effect (i.e., no need
-to type the python -m)
-"""
+"""run when songdkl is called from the command-line, e.g. '$ songdkl --help'"""
 from .parser import get_parser
-from .songdkl import compute_songdkl
+from .songdkl import calculate
 from .numsyls import numsyls
 
 
@@ -14,14 +8,17 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    if args.compute:
-        compute_songdkl(path1=args.compute.path1,
-                        path2=args.compute.path2,
-                        k=args.compute.nsyls1,
-                        k2=args.compute.nsyls2)
+    if args.command == 'calculate':
+        calculate(path1=args.path1,
+                  path2=args.path2,
+                  k=args.n_syl1,
+                  k2=args.n_syl2)
 
-    elif args.numsyls:
-        numsyls()
+    elif args.command == 'numsyls':
+        numsyls(path1=args.path)
+
+    elif args.command is None:
+        parser.print_help()
 
 
 if __name__ == "__main__":
