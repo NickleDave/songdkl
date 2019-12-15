@@ -1,2 +1,2 @@
-from .songdkl import compute_songdkl
+from .songdkl import calculate
 from . import numsyls

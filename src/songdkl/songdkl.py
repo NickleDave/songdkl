@@ -70,8 +70,8 @@ def convert_syl_to_psd(syls, max_num_psds, k, k2):
     return segedpsds
 
 
-def compute_songdkl(path1, path2, k, k2, max_wavs=120, max_num_psds=10000):
-    """compute songdkl metric
+def calculate(path1, path2, k, k2, max_wavs=120, max_num_psds=10000):
+    """calculate songdkl metric
 
     Parameters
     ----------
@@ -137,8 +137,8 @@ def compute_songdkl(path1, path2, k, k2, max_wavs=120, max_num_psds=10000):
     mod2 = GMM(n_components=k2, max_iter=100000, n_init=5, covariance_type='full')
     mod2.fit(s2)
 
-    len2=len(s2)
-    len1=len(d1)
+    len2 = len(s2)
+    len1 = len(d1)
 
     # calculate likelihoods for held out data
     score1_1 = mod1.score(s1_2)
@@ -168,4 +168,4 @@ if __name__ == '__main__':
     path2 = sys.argv[2]
     k = int(sys.argv[3])
     k2 = int(sys.argv[4])
-    calculate_songdkl(path1, path2, k, k2)
+    calculate(path1, path2, k, k2)
