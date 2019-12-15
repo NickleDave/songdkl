@@ -1,11 +1,11 @@
 """run when songdkl is called from the command-line, e.g. '$ songdkl --help'"""
-from .parser import get_parser
+from . import argparser
 from .songdkl import calculate
 from .numsyls import numsyls
 
 
 def main():
-    parser = get_parser()
+    parser = argparser.get()
     args = parser.parse_args()
 
     if args.command == 'calculate':
