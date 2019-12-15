@@ -43,7 +43,7 @@ def _get_all_syls(files):
     return syls, objss
 
 
-def convert_syl_to_psd(syls, max_num_psds, k, k2):
+def convert_syl_to_psd(syls, max_num_psds):
     """convert syllable segments to power spectral density
 
     Parameters
