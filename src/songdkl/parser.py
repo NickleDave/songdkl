@@ -60,17 +60,21 @@ e.g. y34br6 9
 
 
 def get_parser():
-    parser = argparse.ArgumentParser(prog='songdkl',
-                                     description='computes a similarity metric for birdsong',
+    parser = argparse.ArgumentParser(description='a similarity metric for birdsong',
                                      formatter_class=argparse.RawTextHelpFormatter,)
 
-    subparser = parser.add_subparsers()
+    subparser = parser.add_subparsers(title='commands',
+                                      description='''
+                                      valid commands when calling songdkl from the command line,
+                                      \ne.g., 'songdkl calculate'
+                                      ''',
+                                      dest='command')
 
-    compute_subparser = subparser.add_parser('compute', help=COMPUTE_HELP)
-    compute_subparser.add_argument('path1', type=str)
-    compute_subparser.add_argument('n_syl1', type=int)
-    compute_subparser.add_argument('path2', type=str)
-    compute_subparser.add_argument('n_syl2', type=int)
+    calculate_subparser = subparser.add_parser('calculate', help=CALCULATE_HELP)
+    calculate_subparser.add_argument('path1', type=str),
+    calculate_subparser.add_argument('path2', type=str)
+    calculate_subparser.add_argument('n_syl1', type=int)
+    calculate_subparser.add_argument('n_syl2', type=int)
 
     numsyls_subparser = subparser.add_parser('numsyls', help=NUMSYLS_HELP)
     numsyls_subparser.add_argument('path1', type=str)
