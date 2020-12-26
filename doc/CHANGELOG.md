@@ -8,3 +8,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - single-source version, by adding `__about__.py` to `songdkl`
   [#4](https://github.com/NickleDave/songdkl/pull/4)
+- use `poetry` for development
+  [#11](https://github.com/NickleDave/songdkl/pull/11)
