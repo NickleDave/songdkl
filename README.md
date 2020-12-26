@@ -9,11 +9,12 @@ Mets, David G., and Michael S. Brainard.
 PLoS computational biology 14.8 (2018): e1006437.  
 <https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006437&rev=2>
 
-[Data for demo and testing](./src/songdkl/data/) is from the following Dryad data package:  
-Derégnaucourt S, Gahr M (2013) 
-Data from: 
-Horizontal transmission of the father’s song in the Zebra Finch (Taeniopygia guttata). 
-Dryad Digital Repository.  <https://doi.org/10.5061/dryad.7137r>
+Data for demo and testing is from the following Dryad data package:  
+Mets, David G.; Brainard, Michael S. (2019), 
+Data from: An automated approach to the quantitation of vocalizations and vocal learning in the songbird., 
+Dryad, Dataset, <https://doi.org/10.5061/dryad.8tn4660>  
+Dataset can be downloaded here:  
+<https://datadryad.org/stash/dataset/doi:10.5061/dryad.8tn4660>
 
 associated with this paper:  
 Derégnaucourt S, Gahr M (2013) 
