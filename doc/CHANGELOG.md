@@ -10,3 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [#4](https://github.com/NickleDave/songdkl/pull/4)
 - use `poetry` for development
   [#11](https://github.com/NickleDave/songdkl/pull/11)
+
+### Removed
+- remove previous test data set from another paper
+  [de266b5](https://github.com/NickleDave/songdkl/commit/de266b5040b217bc4d9d123eda7776dd57c2c159)
