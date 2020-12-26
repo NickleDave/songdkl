@@ -8,7 +8,7 @@ from matplotlib.pylab import psd
 import numpy as np
 from sklearn.mixture import GaussianMixture as GMM
 
-from .utils import audio
+from . import audio
 
 
 def norm(a):
