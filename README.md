@@ -35,9 +35,15 @@ To set up a development environment, do the following in the terminal:
     $ poetry install
     ```
 
-## usage
-To compute the songdkl between 2 birds
-`$ songdkl-cli --songdkl bird1_dir bird2_dir`
+## Usage
+`songdkl` provides a command-line interface (cli) 
+that allows the user to run the program from the terminal.
 
-To estimate number of syllables in a bird's song
-`$ sondkl-cli --numsyls bird1_dir`
+The cli makes two commands available:
+* `calculate`, to compute the songdkl between two directories of songs, e.g., from 2 birds  
+  `$ songdkl calculate bird1_dir bird2_dir`
+
+* `numsyls`, to estimate the number of syllables in a bird's song  
+  `$ songdkl numsyls bird1_dir`
+
+For details on usage, please run `songdkl --help`.
