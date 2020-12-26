@@ -1,7 +1,7 @@
 # songdkl
 
-the Kullback-Leibler divergence between two distributions corresponding
-to specific song data
+## About
+automated quantitation of vocal learning in the songbird
 
 As described in:  
 Mets, David G., and Michael S. Brainard.  
