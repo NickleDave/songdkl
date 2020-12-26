@@ -16,13 +16,24 @@ Dryad, Dataset, <https://doi.org/10.5061/dryad.8tn4660>
 Dataset can be downloaded here:  
 <https://datadryad.org/stash/dataset/doi:10.5061/dryad.8tn4660>
 
-associated with this paper:  
-Derégnaucourt S, Gahr M (2013) 
-Horizontal transmission of the father’s song in the Zebra Finch (Taeniopygia guttata). 
-Biology Letters 9(4): 20130247. <https://doi.org/10.1098/rsbl.2013.0247>
+## Installation
+### as a user
+`$ pip install songdkl`  
+We recommend installing into a virtual environment, 
+in order to capture the compute environment for computational projects.
+For more information and good practices, please see:  
+<https://the-turing-way.netlify.app/reproducible-research/renv.html>
 
-## installation
-`$ pip install songdkl`
+### as a developer
+The package is developed with `poetry`.
+To set up a development environment, do the following in the terminal:  
+* install `poetry` following their instructions: <https://python-poetry.org/docs/#installation>
+* clone this repository: `git clone https://github.com/NickleDave/songdkl.git` 
+* navigate into the directory that corresponds to this repository, and use `poetry` to set up  
+    ```console
+    $ cd songdkl
+    $ poetry install
+    ```
 
 ## usage
 To compute the songdkl between 2 birds
