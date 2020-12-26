@@ -8,7 +8,6 @@
 
 # Note: To use the 'upload' functionality of this file, you must:
 #   $ pip install twine
-
 import io
 import os
 import sys
@@ -17,17 +16,24 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'songdkl'
-DESCRIPTION = 'neural network that segments and labels birdsong'
-URL = 'https://github.com/yardencsGitHub/tweetynet'
-EMAIL = 'dmets@phy.ucsf.edu'
-AUTHOR = 'David Mets'
-REQUIRES_PYTHON = '>=3.5.0'
-VERSION = '0.1.1a1'
-LICENSE='BSD'
+about = {}
+with open("src/searchstims/__about__.py") as fp:
+    exec(fp.read(), about)
 
+NAME = about['__title__']
+DESCRIPTION = about['__summary__']
+URL = about['__uri__']
+EMAIL = about['__email__']
+AUTHOR = about['__author__']
+VERSION = about['__version__']
+LICENSE = about['__license__']
+
+REQUIRES_PYTHON = '>=3.6.0'
 REQUIRED = [
-    'numpy', 'scipy', 'matplotlib', 'scikit-learn',
+    'matplotlib',
+    'numpy',
+    'scikit-learn',
+    'scipy',
 ]
 
 # What packages are optional?
