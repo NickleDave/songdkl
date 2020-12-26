@@ -1,7 +1,7 @@
 # songdkl
 
-the Kullback-Leibler divergence between two distributions corresponding
-to specific song data
+## About
+automated quantitation of vocal learning in the songbird
 
 As described in:  
 Mets, David G., and Michael S. Brainard.  
@@ -9,23 +9,41 @@ Mets, David G., and Michael S. Brainard.
 PLoS computational biology 14.8 (2018): e1006437.  
 <https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006437&rev=2>
 
-[Data for demo and testing](./src/songdkl/data/) is from the following Dryad data package:  
-Derégnaucourt S, Gahr M (2013) 
-Data from: 
-Horizontal transmission of the father’s song in the Zebra Finch (Taeniopygia guttata). 
-Dryad Digital Repository.  <https://doi.org/10.5061/dryad.7137r>
+Data for demo and testing is from the following Dryad data package:  
+Mets, David G.; Brainard, Michael S. (2019), 
+Data from: An automated approach to the quantitation of vocalizations and vocal learning in the songbird., 
+Dryad, Dataset, <https://doi.org/10.5061/dryad.8tn4660>  
+Dataset can be downloaded here:  
+<https://datadryad.org/stash/dataset/doi:10.5061/dryad.8tn4660>
 
-associated with this paper:  
-Derégnaucourt S, Gahr M (2013) 
-Horizontal transmission of the father’s song in the Zebra Finch (Taeniopygia guttata). 
-Biology Letters 9(4): 20130247. <https://doi.org/10.1098/rsbl.2013.0247>
+## Installation
+### as a user
+`$ pip install songdkl`  
+We recommend installing into a virtual environment, 
+in order to capture the compute environment for computational projects.
+For more information and good practices, please see:  
+<https://the-turing-way.netlify.app/reproducible-research/renv.html>
 
-## installation
-`$ pip install songdkl`
+### as a developer
+The package is developed with `poetry`.
+To set up a development environment, do the following in the terminal:  
+* install `poetry` following their instructions: <https://python-poetry.org/docs/#installation>
+* clone this repository: `git clone https://github.com/NickleDave/songdkl.git` 
+* navigate into the directory that corresponds to this repository, and use `poetry` to set up  
+    ```console
+    $ cd songdkl
+    $ poetry install
+    ```
 
-## usage
-To compute the songdkl between 2 birds
-`$ songdkl-cli --songdkl bird1_dir bird2_dir`
+## Usage
+`songdkl` provides a command-line interface (cli) 
+that allows the user to run the program from the terminal.
 
-To estimate number of syllables in a bird's song
-`$ sondkl-cli --numsyls bird1_dir`
+The cli makes two commands available:
+* `calculate`, to compute the songdkl between two directories of songs, e.g., from 2 birds  
+  `$ songdkl calculate bird1_dir bird2_dir`
+
+* `numsyls`, to estimate the number of syllables in a bird's song  
+  `$ songdkl numsyls bird1_dir`
+
+For details on usage, please run `songdkl --help`.
