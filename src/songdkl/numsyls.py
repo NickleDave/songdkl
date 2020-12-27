@@ -3,9 +3,12 @@ import sys as sys
 import os as os
 import scipy as sc
 
-from pylab import specgram, psd
+from pylab import psd
 import numpy as np
-from sklearn import mixture
+from sklearn.mixture import GaussianMixture as GMM
+
+from .audio import impwav, getsyls
+from .songdkl import norm
 
 
 def chunks(l, n):
