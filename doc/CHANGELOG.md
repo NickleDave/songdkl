@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - use `poetry` for development
   [#11](https://github.com/NickleDave/songdkl/pull/11)
 
+### Fixed
+- Fix README so that it (1) points to dataset associated with paper 
+  instead of another dataset, (2) has user and development install 
+  instructions, and (3) properly explains usage of the command-line 
+  interface
+  [#16](https://github.com/NickleDave/songdkl/pull/16)
+
 ### Removed
 - remove previous test data set from another paper
   [de266b5](https://github.com/NickleDave/songdkl/commit/de266b5040b217bc4d9d123eda7776dd57c2c159)
