@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "songdkl"
-version = "0.1.1a1"
+version = "0.1.0"
 description = "automated quantitation of vocal learning in songbirds"
 authors = ["David Nicholson <nickledave@users.noreply.github.com>"]
 license = "BSD"
