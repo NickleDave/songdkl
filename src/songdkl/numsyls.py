@@ -63,7 +63,7 @@ def EMofgmmcluster(array_of_syls):
         gmm.fit(np.array(s))
         bics.append(gmm.bic(np.array(s)))
         bic.append(np.mean(bics))'''
-        gmm = mixture.GMM(n_components=x, n_iter=100000, n_init=5, covariance_type='full')
+        gmm = GMM(n_components=x, max_iter=100000, n_init=5, covariance_type='full')
         gmm.fit(np.array(s))
         bic.append(gmm.bic(np.array(s)))
     return segedpsds1, bic.index(min(bic)) + 2
