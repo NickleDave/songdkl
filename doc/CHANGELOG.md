@@ -12,11 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [#11](https://github.com/NickleDave/songdkl/pull/11)
 
 ### Fixed
-- Fix README so that it (1) points to dataset associated with paper 
+- fix README so that it (1) points to dataset associated with paper 
   instead of another dataset, (2) has user and development install 
   instructions, and (3) properly explains usage of the command-line 
   interface
   [#16](https://github.com/NickleDave/songdkl/pull/16)
+- fix imports in numsyls.py
+  [ee25b35](https://github.com/NickleDave/songdkl/commit/ee25b359b05e492a455721e109f3b4514b03c4f9)
+- fix parameter name in `numsyls.EMofgmmcluster`
+  [2262f1c](https://github.com/NickleDave/songdkl/commit/2262f1c4a72aced20d6234b4bf846725f3160d7e)
 
 ### Removed
 - remove previous test data set from another paper
