@@ -1,5 +1,4 @@
 import numpy as np
-from mahotas import otsu
 import scipy.signal as signal
 from scipy.io import wavfile
 from scipy import ndimage
@@ -60,10 +59,12 @@ def threshold(a, thresh=None):
     return out
 
 
+# TODO: add option to use scikit-image implementation of Otsu's method
+# https://github.com/NickleDave/songdkl/issues/37
 def findobject(file):
     """finds objects.  Expects a smoothed rectified amplitude envelope"""
-    value = (otsu(np.array(file, dtype=np.uint32))) / 2  # calculate a threshold
-    # value=(np.average(file))/2 #heuristically, this also usually works  for establishing threshold
+    # heuristic way of establishing threshold
+    value = (np.average(file)) / 2
     thresh = threshold(file, value)  # threshold the envelope data
     thresh = threshold(ndimage.convolve(thresh, np.ones(512)), 0.5)  # pad the threshold
     label = (ndimage.label(thresh)[0])  # label objects in the threshold
