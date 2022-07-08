@@ -25,15 +25,27 @@ For more information and good practices, please see:
 <https://the-turing-way.netlify.app/reproducible-research/renv.html>
 
 ### as a developer
-The package is developed with `poetry`.
-To set up a development environment, do the following in the terminal:  
-* install `poetry` following their instructions: <https://python-poetry.org/docs/#installation>
-* clone this repository: `git clone https://github.com/NickleDave/songdkl.git` 
-* navigate into the directory that corresponds to this repository, and use `poetry` to set up  
-    ```console
-    $ cd songdkl
-    $ poetry install
-    ```
+This project uses the library [nox](https://nox.thea.codes/en/stable/) 
+as a [task runner](https://scikit-hep.org/developer/tasks), 
+to automate tasks like setting up a development environment.
+Each task is represented as what nox calls a "session", 
+and you can run a session by invoking nox 
+at the command-line with the name of the session.
+
+So, to set up a virtual environment for development 
+with `songdkl` installed in "editable" mode, 
+run the "dev" session.
+
+We suggest using [pipx](https://github.com/pypa/pipx) 
+to install nox in an isolated environment, 
+so that nox can be accessed system-wide without affecting 
+anything else on your machine.
+
+1. Install [`pipx`](), e.g. with [brew](https://github.com/pypa/pipx#on-macos)
+   (and [brew works on Linux too](https://docs.brew.sh/Homebrew-on-Linux))
+2. Install nox with pipx: `pipx install nox`
+3. Use nox to run the `dev` session: `nox -s dev`
+4. Activate the virtual environment: `. ./.venv/bin/activate` (and/or tell your IDE to use it)
 
 ## Usage
 `songdkl` provides a command-line interface (cli) 
