@@ -1,34 +1,47 @@
-[tool.poetry]
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
 name = "songdkl"
 version = "0.1.0"
 description = "automated quantitation of vocal learning in songbirds"
-authors = ["David Nicholson <nickledave@users.noreply.github.com>"]
-license = "BSD"
+authors = [{name = "David Nicholson", email = "nickledave@users.noreply.github.com"}]
+license = {file = "LICENSE"}
 classifiers = [
         'License :: OSI Approved :: BSD License',
         'Development Status :: 4 - Beta',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython'
 ]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy >=1.19.4",
+    "scipy >=1.5.4",
+    "matplotlib >= 3.3.3",
+    "scikit-learn >= 0.24.0",
+    "mahotas >= 1.4.11",
+]
 
-[tool.poetry.dependencies]
-python = "^3.6"
-numpy = "^1.19.4"
-scipy = "^1.5.4"
-matplotlib = "^3.3.3"
-scikit-learn = "^0.24.0"
-mahotas = "^1.4.11"
+[project.optional-dependencies]
+test = [
+    "pytest >= 6.2.1",
+    "pytest-cov >=2.12.0",
+]
+dev = [
+    "flit",
+    "twine",
+]
+doc = [
+    "Sphinx >= 3.4.1",
+]
 
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.1"
-twine = "^3.3.0"
-Sphinx = "^3.4.1"
-
-[tool.poetry.scripts]
+[project.scripts]
 songdkl = 'songdkl.__main__:main'
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[project.urls]
+Home = "https://github.com/NickleDave/songdkl"
