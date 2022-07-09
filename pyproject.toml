@@ -24,7 +24,6 @@ dependencies = [
     "scipy >=1.5.4",
     "matplotlib >= 3.3.3",
     "scikit-learn >= 0.24.0",
-    "mahotas >= 1.4.11",
 ]
 
 [project.optional-dependencies]
