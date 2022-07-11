@@ -5,7 +5,7 @@ import scipy as sc
 
 from pylab import psd
 import numpy as np
-from sklearn.mixture import GaussianMixture as GMM
+from sklearn.mixture import GMM
 
 from .audio import impwav, getsyls
 from .songdkl import norm
@@ -63,7 +63,7 @@ def EMofgmmcluster(array_of_syls):
         gmm.fit(np.array(s))
         bics.append(gmm.bic(np.array(s)))
         bic.append(np.mean(bics))'''
-        gmm = GMM(n_components=x, max_iter=100000, n_init=5, covariance_type='full')
+        gmm = GMM(n_components=x, n_iter=100000, n_init=5, covariance_type='full')
         gmm.fit(np.array(s))
         bic.append(gmm.bic(np.array(s)))
     return segedpsds1, bic.index(min(bic)) + 2

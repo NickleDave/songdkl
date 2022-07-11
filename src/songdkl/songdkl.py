@@ -6,7 +6,7 @@ from glob import glob
 import scipy.spatial as spatial
 from matplotlib.pylab import psd
 import numpy as np
-from sklearn.mixture import GaussianMixture as GMM
+from sklearn.mixture import GMM
 
 from . import audio
 
@@ -131,10 +131,10 @@ def calculate(path1, path2, k, k2, max_wavs=120, max_num_psds=10000):
     s2_2 = 1 - (d2_2 / mx)
 
     # estimate GMMs
-    mod1 = GMM(n_components=k, max_iter=100000, n_init=5, covariance_type='full')
+    mod1 = GMM(n_components=k, n_iter=100000, n_init=5, covariance_type='full')
     mod1.fit(s1)
 
-    mod2 = GMM(n_components=k2, max_iter=100000, n_init=5, covariance_type='full')
+    mod2 = GMM(n_components=k2, n_iter=100000, n_init=5, covariance_type='full')
     mod2.fit(s2)
 
     len2 = len(s2)
