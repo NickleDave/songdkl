@@ -186,11 +186,3 @@ def calculate(ref_dir_path: str,
     n_psds_compare = len(segedpsds_compare)
 
     return DKL_PQ, DKL_QP, n_psds_ref, n_psds_compare
-
-
-if __name__ == '__main__':
-    path1 = sys.argv[1]
-    path2 = sys.argv[2]
-    k = int(sys.argv[3])
-    k2 = int(sys.argv[4])
-    calculate(path1, path2, k, k2)
