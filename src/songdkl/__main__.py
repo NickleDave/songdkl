@@ -9,10 +9,20 @@ def main():
     args = parser.parse_args()
 
     if args.command == 'calculate':
-        calculate(path1=args.path1,
-                  path2=args.path2,
-                  k=args.n_syl1,
-                  k2=args.n_syl2)
+        score1, score2, n_psds_ref, n_psds_compare = calculate(ref_dir_path=args.ref_dir_path,
+                                                               compare_dir_path=args.compare_dir_path,
+                                                               k_ref=args.k_ref,
+                                                               k_compare=args.k_compare,
+                                                               max_wavs=args.max_wavs,
+                                                               max_num_psds=args.max_num_psds,
+                                                               n_basis=args.n_basis,
+                                                               basis=args.basis)
+        print(
+            f'{args.ref_dir_path}\t{args.compare_dir_path}\t'
+            f'{args.k_ref}\t{args.k_compare}\t'
+            f'{args.n_basis}\t{score1}\t{score2}\t'
+            f'{n_psds_ref}\t{n_psds_compare}'
+        )
 
     elif args.command == 'numsyls':
         numsyls(path1=args.path)
