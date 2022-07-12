@@ -1,12 +1,11 @@
 """functions to compute song divergence"""
-import sys
-import os
-from glob import glob
+import pathlib
+from typing import Tuple, Union, Any
 
 import scipy.spatial as spatial
 from matplotlib.pylab import psd
 import numpy as np
-from sklearn.mixture import GMM
+from sklearn.mixture import GaussianMixture
 
 from . import audio
 
@@ -70,97 +69,123 @@ def convert_syl_to_psd(syls, max_num_psds):
     return segedpsds
 
 
-def calculate(path1, path2, k, k2, max_wavs=120, max_num_psds=10000):
-    """calculate songdkl metric
+def calculate(ref_dir_path: str,
+              compare_dir_path: str,
+              k_ref: int,
+              k_compare: int,
+              max_wavs: int = 120,
+              max_num_psds: int = 10000,
+              n_basis: int = 50,
+              basis:str = 'first') -> Tuple[Union[float, Any], Union[float, Any], int, int]:
+    """Calculate :math:`\text{Song }D_{KL}` metric.
 
     Parameters
     ----------
-    path1 : str
-        path to folder with .wav files of songs from bird 1
-    path2 : str
-        path to folder with .wav files of songs from bird 2
-    k : int
-        number of syllable classes in song 1
-    k2 : int
-        number of syllable classes in song 2
+    ref_dir_path : str
+        Path to directory with .wav files of songs from bird
+        that should be used as reference.
+    compare_dir_path : str
+        Path to directory with .wav files of songs from bird
+        that should be compared with reference.
+    k_ref : int
+        Number of syllable classes in song of bird used as reference.
+    k_compare : int
+        Number of syllable classes in song of bird compared with reference.
     max_wavs : int
-        maximum number of wav files to use. Default is 120.
+        Maximum number of wav files to use. Default is 120.
     max_num_psds : int
-        maximum number of psds to calculate. Default is 10000
+        Maximum number of power spectral densities (PSDs) to calculate.
+        Default is 10000.
+    n_basis : int
+        Number of syllables to use as basis set. Default is 50.
+    basis : str
+        One of {'first', 'random'}.
+        Controls which syllables are used as the basis set.
+        If 'first', use the first `n_basis` syllables.
+        If `random`, grab a random set of size `n_basis`.
 
     Returns
     -------
-    None
-
-    prints estimate of song D(KL) to stdout
+    DKL_PQ : float
+        Calculated value for :math:`D_{KL}(\hat{P}||\hat{Q}`,
+        the information lost when encoding P with Q,
+        as computed according to Equation 6 in Mets Brainard 2018.
+        The main value of interest calculated by this function.
+    DKL_QP : float
+        Same computation as ``DKL_PQ``,
+        but in the opposite direction:
+        Q with respect to P.
+    n_psds_ref : int
+        Number of PSDs used from reference data set.
+    n_psd_compare : int
+        Number of PDSs used from comparison data set.
     """
-    fils1 = glob(os.path.join(path1, '*.wav'))
-    fils2 = glob(os.path.join(path2, '*.wav'))
+    wav_paths_ref = sorted(pathlib.Path(ref_dir_path).glob('*.wav'))
+    wav_paths_compare = sorted(pathlib.Path(compare_dir_path).glob('*.wav'))
 
-    fils1 = fils1[:max_wavs]
-    fils2 = fils2[:max_wavs]
+    wav_paths_ref = wav_paths_ref[:max_wavs]
+    wav_paths_compare = wav_paths_compare[:max_wavs]
 
-    syls1, objss1 = _get_all_syls(fils1) 
-    syls2, objss2 = _get_all_syls(fils2)
+    syls_ref, objss_ref = _get_all_syls(wav_paths_ref)
+    syls_compare, objss_compare = _get_all_syls(wav_paths_compare)
 
-    segedpsds1 = convert_syl_to_psd(syls1, max_num_psds)
-    segedpsds2 = convert_syl_to_psd(syls2, max_num_psds)
+    segedpsds_ref = convert_syl_to_psd(syls_ref, max_num_psds)
+    segedpsds_compare = convert_syl_to_psd(syls_compare, max_num_psds)
 
-    # select the first 50 syllables of the reference song as the basis set
-    basis_set = segedpsds1[:50] 
-    # select a random set of 50 syllablse as the basis set
-    # basis_set=[segedpsds1[rnd.randint(0,len(segedpsds1))] for x in range(50)]
+    if basis == 'first':
+        # select the first `n_basis` syllables of the reference song as the basis set
+        basis_set = segedpsds_ref[:n_basis]
+    elif basis == 'random':
+        # select a random set of `n_basis` syllables as the basis set
+        basis_set = [segedpsds_ref[ind]
+                     for ind in np.random.randint(0, len(segedpsds_ref), size=n_basis)]
+    else:
+        raise ValueError(
+            f"Invalid value for basis: {basis}. Must be one of {{'first', 'random'}}"
+        )
 
-    lone = len(segedpsds1)
-    ltwo = len(segedpsds2)
-    lone_half = int(lone / 2)
-    ltwo_half = int(ltwo / 2)
+    len_ref_half = int(len(segedpsds_ref) / 2)
+    len_compare_half = int(len(segedpsds_compare) / 2)
 
     # calculate distance matrices
-    d1 = spatial.distance.cdist(segedpsds1[:lone_half], basis_set, 'sqeuclidean')
-    d1_2 = spatial.distance.cdist(segedpsds1[lone_half:lone], basis_set, 'sqeuclidean')
-    d2 = spatial.distance.cdist(segedpsds2[:ltwo_half], basis_set, 'sqeuclidean')
-    d2_2 = spatial.distance.cdist(segedpsds2[ltwo_half:ltwo], basis_set, 'sqeuclidean')
+    D_ref = spatial.distance.cdist(segedpsds_ref[:len_ref_half], basis_set, 'sqeuclidean')
+    D_ref_2 = spatial.distance.cdist(segedpsds_ref[len_ref_half:], basis_set, 'sqeuclidean')
+    D_compare = spatial.distance.cdist(segedpsds_compare[:len_compare_half], basis_set, 'sqeuclidean')
+    D_compare_2 = spatial.distance.cdist(segedpsds_compare[len_compare_half:], basis_set, 'sqeuclidean')
 
-    mx = np.max([np.max(d1), np.max(d2), np.max(d1_2), np.max(d2_2)])
+    mx = np.max([np.max(D_ref), np.max(D_compare), np.max(D_ref_2), np.max(D_compare_2)])
 
     # convert to similarity matrices
-    s1 = 1 - (d1 / mx)
-    s1_2 = 1 - (d1_2 / mx)
-    s2 = 1 - (d2 / mx)
-    s2_2 = 1 - (d2_2 / mx)
+    s_ref = 1 - (D_ref / mx)
+    s_ref_2 = 1 - (D_ref_2 / mx)
+    s_compare = 1 - (D_compare / mx)
+    s_compare_2 = 1 - (D_compare_2 / mx)
 
     # estimate GMMs
-    mod1 = GMM(n_components=k, n_iter=100000, n_init=5, covariance_type='full')
-    mod1.fit(s1)
+    P = GaussianMixture(n_components=k_ref, max_iter=100000, n_init=5, covariance_type='full')
+    P.fit(s_ref)
 
-    mod2 = GMM(n_components=k2, n_iter=100000, n_init=5, covariance_type='full')
-    mod2.fit(s2)
-
-    len2 = len(s2)
-    len1 = len(d1)
+    Q = GaussianMixture(n_components=k_compare, max_iter=100000, n_init=5, covariance_type='full')
+    Q.fit(s_compare)
 
     # calculate likelihoods for held out data
-    score1_1 = mod1.score(s1_2)
-    score2_1 = mod2.score(s1_2)
+    p_hat_p = P.score(s_ref_2)
+    q_hat_p = Q.score(s_ref_2)
 
-    score1_2 = mod1.score(s2_2)
-    score2_2 = mod2.score(s2_2)
-
-    len2 = float(len(basis_set))
-    len1 = float(len(basis_set))
+    p_hat_q = P.score(s_compare_2)
+    q_hat_q = Q.score(s_compare_2)
 
     # calculate song divergence (DKL estimate)
-    score1 = np.log2(np.e) * ((np.mean(score1_1)) - (np.mean(score2_1)))
-    score2 = np.log2(np.e) * ((np.mean(score2_2)) - (np.mean(score1_2)))
+    DKL_PQ = np.log2(np.e) * ((np.mean(p_hat_p)) - (np.mean(q_hat_p)))
+    DKL_QP = np.log2(np.e) * ((np.mean(q_hat_q)) - (np.mean(p_hat_q)))
 
-    score1 = score1 / len1
-    score2 = score2 / len2
+    DKL_PQ = DKL_PQ / len(basis_set)
+    DKL_QP = DKL_QP / len(basis_set)
 
-    # output
-    print(path1 + '\t' + path2 + '\t' + str(k) + '\t' + str(k2) 
-          + '\t' + str(len2) + '\t' + str(score1) + '\t' + str(score2)
-          + '\t' + str(len(segedpsds1)) + '\t' + str(len(segedpsds2)))
+    n_psds_ref = len(segedpsds_ref)
+    n_psds_compare = len(segedpsds_compare)
+
+    return DKL_PQ, DKL_QP, n_psds_ref, n_psds_compare
 
 
 if __name__ == '__main__':
