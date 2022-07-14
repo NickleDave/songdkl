@@ -30,15 +30,31 @@ def filtersong(data: np.ndarray):
     return scipy.signal.filtfilt(b, a, data)
 
 
-def smoothrect(a, window=None, freq=None):
-    """smooths and rectifies a song.  Expects (data,samprate)"""
-    if freq == None: freq = 32000  # baseline values if none are provided
-    if window == None: window = 2  # baseline if none are provided
-    le = int(round(freq * window / 1000))  # calculate boxcar kernel length
+def smoothrect(data: np.ndarray,
+               window: int = 2,
+               rate: int = 32000) -> np.ndarray:
+    """Smooth and rectify audio.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Audio data.
+    window : int
+        Default is 2.
+    rate : int
+        Sampling rate.
+        Default is 32000.
+
+    Returns
+    -------
+    smooth : np.ndarray
+        Smoothed rectified audio.
+    """
+    le = int(round(rate * window / 1000))  # calculate boxcar kernel length
     h = np.ones(le) / le  # make boxcar
-    smooth = np.convolve(h, abs(a))  # convovlve boxcar with signal
-    offset = int(round((len(smooth) - len(a)) / 2))  # calculate offset imposed by convolution
-    smooth = smooth[(1 + offset):(len(a) + offset)]  # correct for offset
+    smooth = np.convolve(h, abs(data))  # convolve boxcar with signal
+    offset = int(round((len(smooth) - len(data) / 2))  # calculate offset imposed by convolution
+    smooth = smooth[(1 + offset):(len(data) + offset)]  # correct for offset
     return smooth
 
 
