@@ -1,5 +1,6 @@
 import numpy as np
-import scipy.signal as signal
+import scipy
+import scipy.signal
 from scipy.io import wavfile
 from scipy import ndimage
 
