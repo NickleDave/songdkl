@@ -86,10 +86,11 @@ def getsyls(data: np.ndarray,
 def threshold(a, thresh=None):
     """Returns a thresholded array of the same length as input
     with everything below a specific threshold set to 0.
+
     By default threshold is sigma."""
-    if thresh == None: thresh = sc.std(a)
-    out = np.where(abs(a) > thresh, a, np.zeros(a.shape))
-    return out
+    if thresh is None:
+        thresh = scipy.std(a)
+    return np.where(abs(a) > thresh, a, np.zeros(a.shape))
 
 
 # TODO: add option to use scikit-image implementation of Otsu's method
