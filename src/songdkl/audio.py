@@ -4,13 +4,13 @@ from scipy.io import wavfile
 from scipy import ndimage
 
 
-def impwav(a):
-    """Imports a wave file as an array where a[1] 
-    is the sampling frequency and a[0] is the data"""
-    wav = wavfile.read(a)
-    out = [wav[1], wav[0]]
-    return out
+def load_wav(wav_path):
+    """Load .wav file from path.
 
+    Parameters
+    ----------
+    wav_path : str, pathlib.Path
+        Path to a .wav file.
 
 def filtersong(a):
     """highpass iir filter for song."""
