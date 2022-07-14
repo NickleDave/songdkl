@@ -16,30 +16,34 @@ def norm(a):
     return a
 
 
-def _get_all_syls(files):
-    """get all syllables from all .wav files in a folder
+def get_all_syls(wav_paths: list[str]):
+    """Get all syllables from a list of .wav files
 
     Parameters
     ----------
-    files : list
+    wav_paths : list
         of str, absolute paths to .wav files
-        (output of using glob to find all *.wav files in path)
 
     Returns
     -------
-    syls : 
-    objss :
+    syls : list
+        of lists, same length as ``wav_paths``,
+        where first element in each list
+        is sampling rate, and the rest of the list
+        is syllables
+    slices : list
+        of lists, same length as ``wav_paths``,
+        numpy.slice objects used to
+        find syllables.
     """
     syls = []
-    objss = []
-    for file in files:
-        song = audio.impwav(file)
-        if len(song[0]) < 1:
-            break
-        syls_this_song, objs, frq = audio.getsyls(song)
-        objss.append(objs)
-        syls.append([frq] + syls_this_song)
-    return syls, objss
+    slices = []
+    for wav_path in wav_paths:
+        rate, data = audio.load_wav(wav_path)
+        syls_this_song, slices_this_song = audio.getsyls(rate, data)
+        slices.append(slices_this_song)
+        syls.append([rate] + syls_this_song)
+    return syls, slices
 
 
 def convert_syl_to_psd(syls, max_num_psds):
