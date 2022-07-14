@@ -24,7 +24,8 @@ def load_wav(wav_path):
 
 
 def filtersong(data: np.ndarray):
-    """Apply highpass iir filter to ``data``."""
+    """Apply highpass iir filter to ``data`` to remove low-frequency noise.
+    """
     b, a = scipy.signal.iirdesign(wp=0.04, ws=0.02, gpass=1, gstop=60, ftype='ellip')
     return scipy.signal.filtfilt(b, a, data)
 
@@ -41,21 +42,45 @@ def smoothrect(a, window=None, freq=None):
     return smooth
 
 
-def getsyls(a):
-    """takes a file read in with impwav and returns a list of sylables"""
-    fa = filtersong(a)  # filter song input
-    frq = a[1]  # get sampling frequency from data (a)
-    a = a[0]  # get data from data (a)
-    frqs = frq / 1000  # calcualte length of a ms in samples
-    objs = findobject(smoothrect(fa[0], 10, frq))  # get syllable positions
-    sylables = [x for x in [a[y] for y in objs] if
-                int(len(x)) > (10 * frqs)]  # get syllable data if of sufficient duration
-    '''uncomment the next line to recover syllables that have been high pass filtered as opposed to raw data.
-    Using data filtered prior to PSD calculation helps if you data are contaminated
-    with low frequency noise'''
-    # sylables=[x for x in [fa[0][y] for y in objs] if int(len(x))>(10*frqs)] #get syllable data if of sufficient duration.
-    objs = [y for y in objs if int(len(a[y])) > 10 * frqs]  # get objects of sufficient duraiton
-    return sylables, objs, frq
+def getsyls(data: np.ndarray,
+            rate: int,
+            min_syl_dur=10,
+            syls_filtered=False):
+    """Return a ``list`` of syllables segmented out of an array of audio.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Audio data.
+    rate : int
+        Sampling rate, in Hz.
+    min_syl_dur : int
+        Minimum syllable duration, in milliseconds.
+    syls_filtered : bool
+        If True, use audio data to which high-pass filter
+        has been applied. Default is False.
+        Using data filtered prior to PSD calculation helps
+        if data are contaminated with low frequency noise.
+
+    Returns
+    -------
+    syllables : list
+        of ``numpy.ndarray``
+    slices : np.slice
+    """
+    data_filtered = filtersong(data)
+    slices = findobject(smoothrect(data_filtered, 10, rate))
+
+    # get objects of sufficient duration
+    frqs = rate / 1000  # calculate length of a ms in samples
+    slices = [slice for slice in slices if int(len(data[slices])) > min_syl_dur * frqs]
+
+    if syls_filtered:
+        syllables = [x for x in [data_filtered[slice] for slice in slices]]
+    else:
+        syllables = [x for x in [data[slice] for slice in slices]]
+
+    return syllables, slices
 
 
 def threshold(a, thresh=None):
