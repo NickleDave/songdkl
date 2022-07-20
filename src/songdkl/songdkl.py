@@ -10,10 +10,25 @@ from sklearn.mixture import GaussianMixture
 from . import audio
 
 
-def norm(a):
-    """normalizes a string by its average and syd"""
-    a=(np.array(a) - np.average(a)) / np.std(a)
-    return a
+def norm(arr: np.ndarray) -> np.ndarray:
+    """Normalize an array by
+    subtracting off the mean
+    and dividing by the standard deviation.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        A numpy array
+
+    Returns
+    -------
+    normed : numpy.ndarray
+        ``arr`` with
+    """
+    # replace use of ``np.average`` with ``np.mean``
+    # since ``np.average`` calls ``np.mean`` anyways,
+    # and we are not using weighting that ``np.average`` provides
+    return (np.array(arr) - arr.mean()) / np.std(arr)
 
 
 def get_all_syls(wav_paths: list[str]):
