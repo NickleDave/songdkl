@@ -107,6 +107,7 @@ def calculate(ref_dir_path: str,
         Controls which syllables are used as the basis set.
         If 'first', use the first `n_basis` syllables.
         If `random`, grab a random set of size `n_basis`.
+        Default is 'first'.
 
     Returns
     -------
@@ -130,8 +131,8 @@ def calculate(ref_dir_path: str,
     wav_paths_ref = wav_paths_ref[:max_wavs]
     wav_paths_compare = wav_paths_compare[:max_wavs]
 
-    syls_ref, objss_ref = _get_all_syls(wav_paths_ref)
-    syls_compare, objss_compare = _get_all_syls(wav_paths_compare)
+    syls_ref, slices_ref = get_all_syls(wav_paths_ref)
+    syls_compare, slices_compare = get_all_syls(wav_paths_compare)
 
     segedpsds_ref = convert_syl_to_psd(syls_ref, max_num_psds)
     segedpsds_compare = convert_syl_to_psd(syls_compare, max_num_psds)
