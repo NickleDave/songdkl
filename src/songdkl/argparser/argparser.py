@@ -44,6 +44,6 @@ def get():
     numsyls_subparser = subparser.add_parser('numsyls',
                                              help="estimate the number of syllable types in a song.",
                                              epilog=NUMSYLS_EPILOG)
-    numsyls_subparser.add_argument('path', type=str, help='path to directory containing songs from bird')
+    numsyls_subparser.add_argument('dir_path', type=str, help='path to directory containing songs from bird')
 
     return parser
