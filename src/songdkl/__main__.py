@@ -25,9 +25,9 @@ def main():
         )
 
     elif args.command == 'numsyls':
-        n_syls = numsyls(dir_path=args.ref_dir_path)
+        n_syls = numsyls(dir_path=args.dir_path)
         print(
-            f'{args.ref_dir_path}\t{n_syls}'
+            f'{args.dir_path}\t{n_syls}'
         )
 
     elif args.command is None:
