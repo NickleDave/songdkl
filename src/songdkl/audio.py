@@ -53,7 +53,7 @@ def smoothrect(data: np.ndarray,
     le = int(round(rate * window / 1000))  # calculate boxcar kernel length
     h = np.ones(le) / le  # make boxcar
     smooth = np.convolve(h, abs(data))  # convolve boxcar with signal
-    offset = int(round((len(smooth) - len(data) / 2))  # calculate offset imposed by convolution
+    offset = int(round((len(smooth) - len(data)) / 2))  # calculate offset imposed by convolution
     smooth = smooth[(1 + offset):(len(data) + offset)]  # correct for offset
     return smooth
 
