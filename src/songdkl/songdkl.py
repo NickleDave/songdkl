@@ -3,7 +3,7 @@ import pathlib
 from typing import Tuple, Union, Any
 
 import scipy.spatial as spatial
-from matplotlib.pylab import psd
+import matplotlib.mlab
 import numpy as np
 from sklearn.mixture import GaussianMixture
 
@@ -81,10 +81,9 @@ def convert_syl_to_psd(syls, max_num_psds):
         nfft = int(round(2**14/32000.0*fs))
         segstart = int(round(600/(fs/float(nfft))))
         segend = int(round(16000/(fs/float(nfft))))
-        psds = [psd(norm(y), NFFT=nfft, Fs=fs) for y in x[1:]]
-        spsds = [norm(n[0][segstart:segend]) for n in psds]
-        for n in spsds:
-            segedpsds.append(n)
+        psds = [matplotlib.mlab.psd(norm(y), NFFT=nfft, Fs=fs) for y in x[1:]]
+        spsds = [norm(psd[segstart:segend]) for psd in psds]
+        segedpsds.extend(spsds)
     return segedpsds
 
 
