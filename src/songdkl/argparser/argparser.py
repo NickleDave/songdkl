@@ -32,13 +32,13 @@ def get():
                                      help=('Number of syllable classes in song of bird compared with reference.'
                                            'Also the number of components $k_{compare}$ used for Gaussian Mixture '
                                            'Model fit to the comparison distances.'))
-    calculate_subparser.add_argument('max_wavs', type=int, default=120,
+    calculate_subparser.add_argument('--max_wavs', type=int, default=120,
                                      help='Maximum number of .wav files to use. Default  is 120.')
-    calculate_subparser.add_argument('max_num_psds', type=str, default=10000,
+    calculate_subparser.add_argument('--max_num_psds', type=str, default=10000,
                                      help='Maximum number of power spectral densities (PSDs) to use. Default is 10000.')
-    calculate_subparser.add_argument('n_basis', type=int, default=50,
+    calculate_subparser.add_argument('--n_basis', type=int, default=50,
                                      help='Number of PSDs to use for the basis set. Default is 50.')
-    calculate_subparser.add_argument('basis', type=str, default='first', choices={'first', 'random'},
+    calculate_subparser.add_argument('--basis', type=str, default='first', choices={'first', 'random'},
                                      help="How to select PSDs for basis set. Either 'first' (default) or 'random'")
 
     numsyls_subparser = subparser.add_parser('numsyls',
