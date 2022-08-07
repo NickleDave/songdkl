@@ -15,10 +15,10 @@ def load_wav(wav_path):
 
     Returns
     -------
-    rate : int
-        Sampling rate in Hz.
     data : np.ndarray
         Data from .wav file.
+    rate : int
+        Sampling rate in Hz.
     """
     return wavfile.read(wav_path)
 
