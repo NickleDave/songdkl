@@ -7,9 +7,11 @@
 # jupyter
 .ipynb_checkpoints/
 
-# python
-*__pycache__*
+# Mac
+.DS_Store
 
+#python
+*__pycache__*
 *egg-info/
 dist/
 build/
