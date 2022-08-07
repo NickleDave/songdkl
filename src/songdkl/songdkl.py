@@ -76,18 +76,20 @@ def convert_syl_to_psd(syls, max_num_psds):
     segedpsds
     """
     segedpsds = []
-    for x in syls[:max_num_psds]:
+    for x in syls:
         fs = x[0]
         nfft = int(round(2 ** 14 / 32000.0 * fs))
         segstart = int(round(600 / (fs / float(nfft))))
         segend = int(round(16000 / (fs / float(nfft))))
-        breakpoint()
         psds = []
         for y in x[1:]:
             Pxx, _ = matplotlib.mlab.psd(norm(y), NFFT=nfft, Fs=fs)
             psds.append(Pxx)
         spsds = [norm(psd[segstart:segend]) for psd in psds]
         segedpsds.extend(spsds)
+        if len(segedpsds) > max_num_psds:
+            break
+    segedpsds = segedpsds[:max_num_psds]
     return segedpsds
 
 
