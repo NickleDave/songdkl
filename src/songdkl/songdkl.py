@@ -54,7 +54,7 @@ def get_all_syls(wav_paths: list[str]):
     syls = []
     slices = []
     for wav_path in wav_paths:
-        rate, data = audio.load_wav(wav_path)
+        data, rate = audio.load_wav(wav_path)
         syls_this_song, slices_this_song = audio.getsyls(rate, data)
         slices.append(slices_this_song)
         syls.append([rate] + syls_this_song)
