@@ -89,12 +89,13 @@ def getsyls(data: np.ndarray,
 
     # get objects of sufficient duration
     frqs = rate / 1000  # calculate length of a ms in samples
-    slices = [slice for slice in slices if int(len(data[slices])) > min_syl_dur * frqs]
+    # use name ``slice_`` to not clobber ``slice`` function
+    slices = [slice_ for slice_ in slices if data[slice_].shape[0] > min_syl_dur * frqs]
 
     if syls_filtered:
-        syllables = [x for x in [data_filtered[slice] for slice in slices]]
+        syllables = [x for x in [data_filtered[slice_] for slice_ in slices]]
     else:
-        syllables = [x for x in [data[slice] for slice in slices]]
+        syllables = [x for x in [data[slice_] for slice_ in slices]]
 
     return syllables, slices
 
