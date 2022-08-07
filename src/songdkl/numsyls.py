@@ -81,7 +81,6 @@ def EMofgmmcluster(segedpsds: list,
     # xv=3
     n_components_list = list(range(min_components, max_components))
     for n_components in n_components_list:
-        bics = []
         # this commented section implements cross validation for the BIC values
         '''ss=chunks(s,len(s)/xv)
         for y in range(len(ss)):
