@@ -184,11 +184,14 @@ for x in syls1[:datano]:
     nfft = int(round(2 ** 14 / 32000.0 * fs))
     segstart = int(round(600 / (fs / float(nfft))))
     segend = int(round(16000 / (fs / float(nfft))))
+    # not clear to me why norm is applied twice: once here
     psds = [psd(norm(y), NFFT=nfft, Fs=fs) for y in x[1:]]
+    # and then applied here again. Might have no effect at this point?
     spsds = [norm(n[0][segstart:segend]) for n in psds]
     for n in spsds: segedpsds1.append(n)
     if len(segedpsds1) > datano: break
 
+# we pass in segedpsds1 but then these get run through the code again that makes PSDs
 segedpsds, sylno_bic = EMofgmmcluster(segedpsds1)
 
 print
