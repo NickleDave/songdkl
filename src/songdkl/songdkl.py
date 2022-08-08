@@ -173,11 +173,11 @@ def calculate(ref_dir_path: str,
     wav_paths_ref = wav_paths_ref[:max_wavs]
     wav_paths_compare = wav_paths_compare[:max_wavs]
 
-    syls_ref, slices_ref = get_all_syls(wav_paths_ref)
-    syls_compare, slices_compare = get_all_syls(wav_paths_compare)
+    syls_from_wavs_ref = get_all_syls(wav_paths_ref)
+    syls_from_wavs_compare = get_all_syls(wav_paths_compare)
 
-    segedpsds_ref = convert_syl_to_psd(syls_ref, max_num_psds)
-    segedpsds_compare = convert_syl_to_psd(syls_compare, max_num_psds)
+    segedpsds_ref = convert_syl_to_psd(syls_from_wavs_ref, max_num_psds)
+    segedpsds_compare = convert_syl_to_psd(syls_from_wavs_compare, max_num_psds)
 
     if basis == 'first':
         # select the first `n_basis` syllables of the reference song as the basis set
