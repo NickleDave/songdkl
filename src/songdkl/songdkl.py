@@ -1,4 +1,6 @@
 """functions to compute song divergence"""
+from __future__ import annotations
+import dataclasses
 import pathlib
 from typing import Tuple, Union, Any
 
@@ -31,34 +33,54 @@ def norm(arr: np.ndarray) -> np.ndarray:
     return (np.array(arr) - arr.mean()) / np.std(arr)
 
 
-def get_all_syls(wav_paths: list[str]):
-    """Get all syllables from a list of .wav files
+@dataclasses.dataclass
+class SyllablesFromWav:
+    """
+    Dataclass representing
+    all the syllables
+    found by segmenting a
+    .wav file.
+
+    Attributes
+    ----------
+    syls : list
+        Of ``numpy.ndarray``, syllables
+        returned by ``songdkl.audio.getsyls``
+    rate : int
+        Sampling rate of .wav file.
+    """
+    syls: list
+    rate: int
+
+
+def get_all_syls(wav_paths: list[str]) -> list[SyllablesFromWav]:
+    """Get all syllables from a list of .wav files.
 
     Parameters
     ----------
-    wav_paths : listconvert
-        of str, absolute paths to .wav files
+    wav_paths : list
+        Of str, absolute paths to .wav files
 
     Returns
     -------
-    syls : list
-        of lists, same length as ``wav_paths``,
-        where first element in each list
-        is sampling rate, and the rest of the list
-        is syllables
-    slices : list
-        of lists, same length as ``wav_paths``,
-        numpy.slice objects used to
-        find syllables.
+    syls_from_wavs : list
+        of ``SyllablesFromWav`` instances,
+        same length as ``wav_paths``.
+        Each ``SyllablesFromWav`` has an
+        attribute ``syls``, a list of
+        ``numpy.ndarray``s, and an attribute
+        ``rate``, the sampling rate
+        for the .wav file the syllables
+        are taken from.
     """
-    syls = []
-    slices = []
+    syls_from_wavs = []
     for wav_path in wav_paths:
         rate, data = audio.load_wav(wav_path)
-        syls_this_song, slices_this_song = audio.getsyls(data, rate)
-        slices.append(slices_this_song)
-        syls.append([rate] + syls_this_song)
-    return syls, slices
+        syls_this_wav, slices_this_wav = audio.getsyls(data, rate)
+        syls_from_wavs.append(
+            SyllablesFromWav(syls=syls_this_wav, rate=rate)
+        )
+    return syls_from_wavs
 
 
 def convert_syl_to_psd(syls, max_num_psds):
