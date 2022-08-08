@@ -117,12 +117,17 @@ def numsyls(dir_path,
 
     Returns
     -------
+    sylno_bic : int
+        The estimated number of syllables, equal to
+        the number of components
+        that produced the fit Gaussian Mixture Model
+        with the lowest Bayesian Information Criterion.
     """
     wav_paths = sorted(pathlib.Path(dir_path).glob('*.wav'))
     wav_paths = wav_paths[:max_wavs]
 
-    syls, slices = get_all_syls(wav_paths)
-    segedpsds = convert_syl_to_psd(syls, max_num_psds)
+    syls_from_wavs = get_all_syls(wav_paths)
+    segedpsds = convert_syl_to_psd(syls_from_wavs, max_num_psds)
     sylno_bic = EMofgmmcluster(segedpsds)
     return sylno_bic
 
