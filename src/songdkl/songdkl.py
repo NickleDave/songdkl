@@ -2,7 +2,7 @@
 from __future__ import annotations
 import dataclasses
 import pathlib
-from typing import Tuple, Union, Any
+from typing import Any, Optional, Tuple, Union
 
 import scipy.spatial as spatial
 import matplotlib.mlab
@@ -28,7 +28,7 @@ def norm(arr: np.ndarray) -> np.ndarray:
         ``arr`` with
     """
     # replace use of ``np.average`` with ``np.mean``
-    # since ``np.average`` calls ``np.mean`` anyways,
+    # since ``np.average`` calls ``np.mean`` anyways,, Any
     # and we are not using weighting that ``np.average`` provides
     return (np.array(arr) - arr.mean()) / np.std(arr)
 
@@ -83,35 +83,46 @@ def get_all_syls(wav_paths: list[str]) -> list[SyllablesFromWav]:
     return syls_from_wavs
 
 
-def convert_syl_to_psd(syls, max_num_psds):
-    """convert syllable segments to power spectral density
+def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
+                       max_num_psds: Optional[int] = None) -> list[np.ndarray]:
+    """Convert syllable segments to power spectral densities (PSDs).
 
     Parameters
     ----------
-    syls : list
-        of ndarray, syllable segments extracted from .wav files
+    syls_from_wavs : list
+        Of ``SyllablesFromWav`` instances,
+        syllable segments extracted from .wav files.
     max_num_psds : int
-        maximum number of psds to calculate
+        Maximum number of PSDs to calculate.
+        Default is None, in which case
+        PSDs will be computed for all syllables.
 
     Returns
     -------
-    segedpsds
+    segedpsds : list
+        Of ``numpy.ndarray``,
+        PSDs from segmented syllables.
     """
     segedpsds = []
-    for x in syls:
-        fs = x[0]
+    for syls_from_wav in syls_from_wavs:
+        fs = syls_from_wav.rate
         nfft = int(round(2 ** 14 / 32000.0 * fs))
         segstart = int(round(600 / (fs / float(nfft))))
         segend = int(round(16000 / (fs / float(nfft))))
         psds = []
-        for y in x[1:]:
-            Pxx, _ = matplotlib.mlab.psd(norm(y), NFFT=nfft, Fs=fs)
+        for syl in syls_from_wav.syls:
+            Pxx, _ = matplotlib.mlab.psd(norm(syl), NFFT=nfft, Fs=fs)
             psds.append(Pxx)
         spsds = [norm(psd[segstart:segend]) for psd in psds]
         segedpsds.extend(spsds)
-        if len(segedpsds) > max_num_psds:
-            break
-    segedpsds = segedpsds[:max_num_psds]
+        if max_num_psds:
+            if len(segedpsds) > max_num_psds:
+                break
+
+    if max_num_psds:
+        # since we are likely over `max_num_psds` even after `break` above
+        segedpsds = segedpsds[:max_num_psds]
+
     return segedpsds
 
 
