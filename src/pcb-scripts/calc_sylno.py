@@ -194,5 +194,4 @@ for x in syls1[:datano]:
 # we pass in segedpsds1 but then these get run through the code again that makes PSDs
 segedpsds, sylno_bic = EMofgmmcluster(segedpsds1)
 
-print
-filename1 + '\t' + str(sylno_bic)
+print filename1 + '\t' + str(sylno_bic)
