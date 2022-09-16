@@ -1,3 +1,6 @@
+from __future__ import annotations
+import pathlib
+
 import numpy as np
 import scipy
 import scipy.signal
@@ -5,7 +8,7 @@ from scipy.io import wavfile
 from scipy import ndimage
 
 
-def load_wav(wav_path):
+def load_wav(wav_path: str | pathlib.Path) -> (int, np.array):
     """Load .wav file from path.
 
     Parameters
@@ -13,17 +16,17 @@ def load_wav(wav_path):
     wav_path : str, pathlib.Path
         Path to a .wav file.
 
-    Returns
+    Returnssrc/songdkl/songdkl.py
     -------
-    data : np.ndarray
-        Data from .wav file.
     rate : int
         Sampling rate in Hz.
+    data : np.ndarray
+        Data from .wav file.
     """
     return wavfile.read(wav_path)
 
 
-def filtersong(data: np.ndarray):
+def filtersong(data: np.ndarray) -> np.ndarray:
     """Apply highpass iir filter to ``data`` to remove low-frequency noise.
     """
     b, a = scipy.signal.iirdesign(wp=0.04, ws=0.02, gpass=1, gstop=60, ftype='ellip')
@@ -61,7 +64,7 @@ def smoothrect(data: np.ndarray,
 def getsyls(data: np.ndarray,
             rate: int,
             min_syl_dur=10,
-            syls_filtered=False):
+            syls_filtered=False) -> (list[np.array], list[tuple[slice]]):
     """Return a ``list`` of syllables segmented out of an array of audio.
 
     Parameters
@@ -81,8 +84,9 @@ def getsyls(data: np.ndarray,
     Returns
     -------
     syllables : list
-        of ``numpy.ndarray``
-    slices : np.slice
+        of ``numpy.ndarray``.
+    slices : list
+        of tuples of slices.
     """
     data_filtered = filtersong(data)
     slices = findobject(smoothrect(data_filtered, 10, rate))
@@ -100,7 +104,7 @@ def getsyls(data: np.ndarray,
     return syllables, slices
 
 
-def threshold(a, thresh=None):
+def threshold(a: np.ndarray, thresh: int | float | None = None) -> np.ndarray:
     """Returns a thresholded array of the same length as input
     with everything below a specific threshold set to 0.
 
@@ -112,7 +116,7 @@ def threshold(a, thresh=None):
 
 # TODO: add option to use scikit-image implementation of Otsu's method
 # https://github.com/NickleDave/songdkl/issues/37
-def findobject(file):
+def findobject(file: np.ndarray) -> list[tuple[slice]]:
     """finds objects.  Expects a smoothed rectified amplitude envelope"""
     # heuristic way of establishing threshold
     value = (np.average(file)) / 2
