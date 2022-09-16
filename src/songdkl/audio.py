@@ -61,6 +61,36 @@ def smoothrect(data: np.ndarray,
     return smooth
 
 
+# TODO: add option to use scikit-image implementation of Otsu's method
+# https://github.com/NickleDave/songdkl/issues/37
+def findobject(arr: np.ndarray) -> list[tuple[slice]]:
+    """Segment audio into syllables
+    using ``scipy.ndimage.find_objects``.
+    Expects a smoothed rectified amplitude envelope,
+    e.g. as returned by ``songdkl.audio.smoothrect``.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        Containing smoothed rectified amplitude envelope
+        from a .wav file.
+
+    Returns
+    -------
+    objs : list
+        Of tuples of slices;
+        the segments identified by
+        ``scipy.ndimage.find_objects``.
+    """
+    # heuristic way of establishing threshold
+    value = (np.average(arr)) / 2
+    thresh = threshold(arr, value)  # threshold the envelope data
+    thresh = threshold(ndimage.convolve(thresh, np.ones(512)), 0.5)  # pad the threshold
+    label = (ndimage.label(thresh)[0])  # label objects in the threshold
+    objs = ndimage.find_objects(label)  # recover object positions
+    return objs
+
+
 def getsyls(data: np.ndarray,
             rate: int,
             min_syl_dur=10,
@@ -113,15 +143,3 @@ def threshold(a: np.ndarray, thresh: int | float | None = None) -> np.ndarray:
         thresh = scipy.std(a)
     return np.where(abs(a) > thresh, a, np.zeros(a.shape))
 
-
-# TODO: add option to use scikit-image implementation of Otsu's method
-# https://github.com/NickleDave/songdkl/issues/37
-def findobject(file: np.ndarray) -> list[tuple[slice]]:
-    """finds objects.  Expects a smoothed rectified amplitude envelope"""
-    # heuristic way of establishing threshold
-    value = (np.average(file)) / 2
-    thresh = threshold(file, value)  # threshold the envelope data
-    thresh = threshold(ndimage.convolve(thresh, np.ones(512)), 0.5)  # pad the threshold
-    label = (ndimage.label(thresh)[0])  # label objects in the threshold
-    objs = ndimage.find_objects(label)  # recover object positions
-    return objs
