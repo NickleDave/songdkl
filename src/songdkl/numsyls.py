@@ -128,9 +128,3 @@ def numsyls(dir_path,
     segedpsds = convert_syl_to_psd(syls_from_wavs, max_num_psds)
     sylno_bic = EMofgmmcluster(segedpsds)
     return sylno_bic
-
-
-if __name__ == '__main__':
-    # main program
-    path1 = sys.argv[1]
-    numsyls(path1)
