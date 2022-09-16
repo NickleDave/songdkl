@@ -1,6 +1,5 @@
 """functions to estimate the number of syllables in a bird's song"""
 import pathlib
-import sys as sys
 
 import numpy as np
 from sklearn.mixture import GaussianMixture
@@ -12,34 +11,19 @@ from .songdkl import (
 )
 
 
-def chunks(l, n):
-    """ Yield successive n-sized chunks from l.
-    """
-    out = []
-    lens = (len(l) / n)
-    for i in range(0, lens):
-        out.append(l[i * n:i * n + n])
-    out.append(l[lens * n:])
-    return out[:-1]
-
-
 def EMofgmmcluster(segedpsds: list,
                    n_basis: int = 50,
-                   basis:str = 'first',
-                   min_components=2,
-                   max_components=22,
-                   ):
-    """takes an array of segmented syllables, fits a series of
+                   basis: str = 'first',
+                   min_components: int = 2,
+                   max_components: int = 22,
+                   n_splits: int = 1,
+                   ) -> int:
+    """Identifies the best number of mixtures to describe the data.
+
+    Takes an array of segmented syllables, fits a series of
     gaussian mixture models with an increasing number of mixtures,
     and identifies the best number of mixtures to describe the data
-    by BIC.
-
-    If data is limiting, we don't recommend using cross validation
-    for BIC.  If you have sufficient data 3-fold cross-validated BIC values
-    compare well with un-cross validated values and human assessment of syllable
-    number.  If data are limiting, cross-validated values underestimate
-    the number of syllables relative to human assessment or non-cross
-    validated BIC values.
+    by Bayesian Information Criterion (BIC).
 
     Parameters
     ----------
@@ -60,12 +44,28 @@ def EMofgmmcluster(segedpsds: list,
     max_components : int
         Maximum number of components to consider
         when fitting Gaussian Mixture Models. Default is 22.
+    n_splits : int
+        Number of splits to use when estimating components.
+        Default is 1, in which case ``segedpsds`` is not split.
+        If sufficient data are available,
+        a good rule of thumb is to use 3 splits.
+        See Notes below for more detail.
 
     Returns
     -------
     n_syls : int
         The number of components that gave the minimum
         Bayesian Information Criterion, plus two.
+
+    Notes
+    -----
+    If data is limiting, we don't recommend using
+    splits to estimate BIC.
+    When the data are limiting,
+    values from splits underestimate
+    the number of syllables relative to
+    human assessment or BIC values
+    computed without splits.
     """
     if basis == 'first':
         # select the first `n_basis` syllables of the reference song as the basis set
@@ -78,22 +78,20 @@ def EMofgmmcluster(segedpsds: list,
     D = scipy.spatial.distance.cdist(segedpsds, basis_set, 'sqeuclidean')
     s = 1 - D / np.max(D) * 1000
     bics = []
-    # xv=3
     n_components_list = list(range(min_components, max_components))
     for n_components in n_components_list:
-        # this commented section implements cross validation for the BIC values
-        '''ss=chunks(s,len(s)/xv)
-        for y in range(len(ss)):
-        testset=ss[y]
-        trainset=[]
-        [trainset.extend(ss[n]) for n in [z for z in range(len(ss)) if z!=y]]
-        gmm = mixture.GMM(n_components=x, n_iter=100000,n_init=5, covariance_type='full')
-        gmm.fit(np.array(s))
-        bics.append(gmm.bic(np.array(s)))
-        bic.append(np.mean(bics))'''
-        gmm = GaussianMixture(n_components=n_components, max_iter=100000, n_init=5, covariance_type='full')
-        gmm.fit(np.array(s))
-        bics.append(gmm.bic(np.array(s)))
+        if n_splits > 1:
+            split_bics = []
+            splits = np.array_split(s, n_splits)
+            for split in splits:
+                gmm = GaussianMixture(n_components=n_components, max_iter=100000, n_init=5, covariance_type='full')
+                gmm.fit(split)
+                split_bics.append(gmm.bic(split))
+            bics.append(np.mean(split_bics))
+        else:
+            gmm = GaussianMixture(n_components=n_components, max_iter=100000, n_init=5, covariance_type='full')
+            gmm.fit(np.array(s))
+            bics.append(gmm.bic(np.array(s)))
     lowest_bic_ind = np.argmin(bics)
     n_syls = n_components_list[lowest_bic_ind]
     return n_syls
