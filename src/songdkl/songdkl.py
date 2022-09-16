@@ -28,7 +28,7 @@ def norm(arr: np.ndarray) -> np.ndarray:
         ``arr`` with
     """
     # replace use of ``np.average`` with ``np.mean``
-    # since ``np.average`` calls ``np.mean`` anyways,, Any
+    # since ``np.average`` calls ``np.mean`` anyways,
     # and we are not using weighting that ``np.average`` provides
     return (np.array(arr) - arr.mean()) / np.std(arr)
 
