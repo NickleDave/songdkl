@@ -16,7 +16,7 @@ def load_wav(wav_path: str | pathlib.Path) -> (int, np.array):
     wav_path : str, pathlib.Path
         Path to a .wav file.
 
-    Returnssrc/songdkl/songdkl.py
+    Returns
     -------
     rate : int
         Sampling rate in Hz.
