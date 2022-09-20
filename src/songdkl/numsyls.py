@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.mixture import GaussianMixture
 import scipy.spatial
 
-from .songdkl import (
+from .syllables import (
     convert_syl_to_psd,
     get_all_syls,
 )
