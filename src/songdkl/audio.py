@@ -94,7 +94,7 @@ def findobject(arr: np.ndarray) -> list[tuple[slice]]:
 def getsyls(data: np.ndarray,
             rate: int,
             min_syl_dur=10,
-            syls_filtered=False) -> (list[np.array], list[tuple[slice]]):
+            syls_filtered=False) -> tuple[list[np.array], list[tuple[slice]]]:
     """Return a ``list`` of syllables segmented out of an array of audio.
 
     Parameters
@@ -142,4 +142,3 @@ def threshold(a: np.ndarray, thresh: int | float | None = None) -> np.ndarray:
     if thresh is None:
         thresh = scipy.std(a)
     return np.where(abs(a) > thresh, a, np.zeros(a.shape))
-
