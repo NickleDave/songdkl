@@ -100,7 +100,7 @@ def em_of_gmm_cluster(segedpsds: list,
 def numsyls(dir_path,
             max_wavs: int = 120,
             max_num_psds: int = 15000,
-            ):
+            ) -> int:
     """Determine number of syllable classes in a bird's song,
     by fitting Gaussian Mixture Models to PSDs of segmented
     syllable renditions, and selecting the number of components
