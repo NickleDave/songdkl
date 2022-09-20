@@ -11,13 +11,13 @@ from .songdkl import (
 )
 
 
-def EMofgmmcluster(segedpsds: list,
-                   n_basis: int = 50,
-                   basis: str = 'first',
-                   min_components: int = 2,
-                   max_components: int = 22,
-                   n_splits: int = 1,
-                   ) -> int:
+def em_of_gmm_cluster(segedpsds: list,
+                      n_basis: int = 50,
+                      basis: str = 'first',
+                      min_components: int = 2,
+                      max_components: int = 22,
+                      n_splits: int = 1,
+                      ) -> int:
     """Identifies the best number of mixtures to describe the data.
 
     Takes an array of segmented syllables, fits a series of
@@ -126,5 +126,5 @@ def numsyls(dir_path,
 
     syls_from_wavs = get_all_syls(wav_paths)
     segedpsds = convert_syl_to_psd(syls_from_wavs, max_num_psds)
-    sylno_bic = EMofgmmcluster(segedpsds)
+    sylno_bic = em_of_gmm_cluster(segedpsds)
     return sylno_bic
