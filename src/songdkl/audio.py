@@ -12,13 +12,20 @@ def load_wav(wav_path):
     wav_path : str, pathlib.Path
         Path to a .wav file.
 
-def filtersong(a):
-    """highpass iir filter for song."""
-    out = []
-    b = signal.iirdesign(wp=0.04, ws=0.02, gpass=1, gstop=60, ftype='ellip')
-    out.append(signal.filtfilt(b[0], b[1], a[0]))
-    out.append(a[1])
-    return out
+    Returns
+    -------
+    rate : int
+        Sampling rate in Hz.
+    data : np.ndarray
+        Data from .wav file.
+    """
+    return wavfile.read(wav_path)
+
+
+def filtersong(data: np.ndarray):
+    """Apply highpass iir filter to ``data``."""
+    b, a = scipy.signal.iirdesign(wp=0.04, ws=0.02, gpass=1, gstop=60, ftype='ellip')
+    return scipy.signal.filtfilt(b, a, data)
 
 
 def smoothrect(a, window=None, freq=None):
