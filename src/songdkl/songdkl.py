@@ -13,14 +13,14 @@ from .syllables import (
 )
 
 
-def calculate(ref_dir_path: str,
-              compare_dir_path: str,
+def calculate(ref_dir_path: str | pathlib.Path,
+              compare_dir_path: str | pathlib.Path,
               k_ref: int,
               k_compare: int,
               max_wavs: int = 120,
               max_num_psds: int = 10000,
               n_basis: int = 50,
-              basis:str = 'first') -> Tuple[Union[float, Any], Union[float, Any], int, int]:
+              basis: str = 'first') -> Tuple[Union[float, Any], Union[float, Any], int, int]:
     """Calculate :math:`\text{Song }D_{KL}` metric.
 
     Parameters
