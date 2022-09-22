@@ -23,7 +23,7 @@ __title__ = "songdkl"
 __summary__ = 'automated quantitation of vocal learning in songbirds'
 __uri__ = 'https://github.com/NickleDave/songdkl'
 
-__version__ = '0.1.0'
+__version__ = '0.2.0b1'
 
 if base_dir is not None and os.path.exists(os.path.join(base_dir, ".commit")):
     with open(os.path.join(base_dir, ".commit")) as fp:
