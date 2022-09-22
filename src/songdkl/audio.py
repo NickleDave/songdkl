@@ -1,72 +1,144 @@
+from __future__ import annotations
+import pathlib
+
 import numpy as np
-import scipy.signal as signal
+import scipy
+import scipy.signal
 from scipy.io import wavfile
 from scipy import ndimage
 
 
-def impwav(a):
-    """Imports a wave file as an array where a[1] 
-    is the sampling frequency and a[0] is the data"""
-    wav = wavfile.read(a)
-    out = [wav[1], wav[0]]
-    return out
+def load_wav(wav_path: str | pathlib.Path) -> (int, np.array):
+    """Load .wav file from path.
+
+    Parameters
+    ----------
+    wav_path : str, pathlib.Path
+        Path to a .wav file.
+
+    Returns
+    -------
+    rate : int
+        Sampling rate in Hz.
+    data : np.ndarray
+        Data from .wav file.
+    """
+    return wavfile.read(wav_path)
 
 
-def filtersong(a):
-    """highpass iir filter for song."""
-    out = []
-    b = signal.iirdesign(wp=0.04, ws=0.02, gpass=1, gstop=60, ftype='ellip')
-    out.append(signal.filtfilt(b[0], b[1], a[0]))
-    out.append(a[1])
-    return out
+def filtersong(data: np.ndarray) -> np.ndarray:
+    """Apply highpass iir filter to ``data`` to remove low-frequency noise.
+    """
+    b, a = scipy.signal.iirdesign(wp=0.04, ws=0.02, gpass=1, gstop=60, ftype='ellip')
+    return scipy.signal.filtfilt(b, a, data)
 
 
-def smoothrect(a, window=None, freq=None):
-    """smooths and rectifies a song.  Expects (data,samprate)"""
-    if freq == None: freq = 32000  # baseline values if none are provided
-    if window == None: window = 2  # baseline if none are provided
-    le = int(round(freq * window / 1000))  # calculate boxcar kernel length
+def smoothrect(data: np.ndarray,
+               window: int = 2,
+               rate: int = 32000) -> np.ndarray:
+    """Smooth and rectify audio.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Audio data.
+    window : int
+        Default is 2.
+    rate : int
+        Sampling rate.
+        Default is 32000.
+
+    Returns
+    -------
+    smooth : np.ndarray
+        Smoothed rectified audio.
+    """
+    le = int(round(rate * window / 1000))  # calculate boxcar kernel length
     h = np.ones(le) / le  # make boxcar
-    smooth = np.convolve(h, abs(a))  # convovlve boxcar with signal
-    offset = int(round((len(smooth) - len(a)) / 2))  # calculate offset imposed by convolution
-    smooth = smooth[(1 + offset):(len(a) + offset)]  # correct for offset
+    smooth = np.convolve(h, abs(data))  # convolve boxcar with signal
+    offset = int(round((len(smooth) - len(data)) / 2))  # calculate offset imposed by convolution
+    smooth = smooth[(1 + offset):(len(data) + offset)]  # correct for offset
     return smooth
-
-
-def getsyls(a):
-    """takes a file read in with impwav and returns a list of sylables"""
-    fa = filtersong(a)  # filter song input
-    frq = a[1]  # get sampling frequency from data (a)
-    a = a[0]  # get data from data (a)
-    frqs = frq / 1000  # calcualte length of a ms in samples
-    objs = findobject(smoothrect(fa[0], 10, frq))  # get syllable positions
-    sylables = [x for x in [a[y] for y in objs] if
-                int(len(x)) > (10 * frqs)]  # get syllable data if of sufficient duration
-    '''uncomment the next line to recover syllables that have been high pass filtered as opposed to raw data.
-    Using data filtered prior to PSD calculation helps if you data are contaminated
-    with low frequency noise'''
-    # sylables=[x for x in [fa[0][y] for y in objs] if int(len(x))>(10*frqs)] #get syllable data if of sufficient duration.
-    objs = [y for y in objs if int(len(a[y])) > 10 * frqs]  # get objects of sufficient duraiton
-    return sylables, objs, frq
-
-
-def threshold(a, thresh=None):
-    """Returns a thresholded array of the same length as input
-    with everything below a specific threshold set to 0.
-    By default threshold is sigma."""
-    if thresh == None: thresh = sc.std(a)
-    out = np.where(abs(a) > thresh, a, np.zeros(a.shape))
-    return out
 
 
 # TODO: add option to use scikit-image implementation of Otsu's method
 # https://github.com/NickleDave/songdkl/issues/37
-def findobject(file):
-    """finds objects.  Expects a smoothed rectified amplitude envelope"""
+def findobject(arr: np.ndarray) -> list[tuple[slice]]:
+    """Segment audio into syllables
+    using ``scipy.ndimage.find_objects``.
+    Expects a smoothed rectified amplitude envelope,
+    e.g. as returned by ``songdkl.audio.smoothrect``.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        Containing smoothed rectified amplitude envelope
+        from a .wav file.
+
+    Returns
+    -------
+    objs : list
+        Of tuples of slices;
+        the segments identified by
+        ``scipy.ndimage.find_objects``.
+    """
     # heuristic way of establishing threshold
-    value = (np.average(file)) / 2
-    thresh = threshold(file, value)  # threshold the envelope data
+    value = (np.average(arr)) / 2
+    thresh = threshold(arr, value)  # threshold the envelope data
     thresh = threshold(ndimage.convolve(thresh, np.ones(512)), 0.5)  # pad the threshold
     label = (ndimage.label(thresh)[0])  # label objects in the threshold
     objs = ndimage.find_objects(label)  # recover object positions
     return objs
+
+
+def getsyls(data: np.ndarray,
+            rate: int,
+            min_syl_dur=10,
+            syls_filtered=False) -> tuple[list[np.array], list[tuple[slice]]]:
+    """Return a ``list`` of syllables segmented out of an array of audio.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Audio data.
+    rate : int
+        Sampling rate, in Hz.
+    min_syl_dur : int
+        Minimum syllable duration, in milliseconds.
+    syls_filtered : bool
+        If True, use audio data to which high-pass filter
+        has been applied. Default is False.
+        Using data filtered prior to PSD calculation helps
+        if data are contaminated with low frequency noise.
+
+    Returns
+    -------
+    syllables : list
+        of ``numpy.ndarray``.
+    slices : list
+        of tuples of slices.
+    """
+    data_filtered = filtersong(data)
+    slices = findobject(smoothrect(data_filtered, 10, rate))
+
+    # get objects of sufficient duration
+    frqs = rate / 1000  # calculate length of a ms in samples
+    # use name ``slice_`` to not clobber ``slice`` function
+    slices = [slice_ for slice_ in slices if data[slice_].shape[0] > min_syl_dur * frqs]
+
+    if syls_filtered:
+        syllables = [x for x in [data_filtered[slice_] for slice_ in slices]]
+    else:
+        syllables = [x for x in [data[slice_] for slice_ in slices]]
+
+    return syllables, slices
+
+
+def threshold(a: np.ndarray, thresh: int | float | None = None) -> np.ndarray:
+    """Returns a thresholded array of the same length as input
+    with everything below a specific threshold set to 0.
+
+    By default threshold is sigma."""
+    if thresh is None:
+        thresh = scipy.std(a)
+    return np.where(abs(a) > thresh, a, np.zeros(a.shape))
