@@ -97,7 +97,7 @@ def em_of_gmm_cluster(segedpsds: list,
     return n_syls
 
 
-def numsyls(dir_path,
+def numsyls(dir_path: str | pathlib.Path,
             max_wavs: int = 120,
             max_num_psds: int = 15000,
             ) -> int:
