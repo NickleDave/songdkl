@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [#43](https://github.com/NickleDave/songdkl/pull/43).
   Fixes [#40](https://github.com/NickleDave/songdkl/issues/40).
 
+### Changed
+- Refactor/revise codebase for readability
+  [#46](https://github.com/NickleDave/songdkl/pull/46).
+  Also add/revise docstrings, type annotations. 
+  Fixes [#21](https://github.com/NickleDave/songdkl/issues/21),
+  [#23](https://github.com/NickleDave/songdkl/issues/23),
+  and [#24](https://github.com/NickleDave/songdkl/issues/24).
+
 ## [0.1.0]
 ### Changed
 - single-source version, by adding `__about__.py` to `songdkl`
