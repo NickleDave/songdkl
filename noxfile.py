@@ -1,6 +1,9 @@
 import os
 import pathlib
 import shutil
+import tarfile
+import time
+import urllib.request
 
 import nox
 
@@ -91,3 +94,63 @@ def doc(session: nox.Session) -> None:
             print("Unsupported argument to docs")
     else:
         session.run("sphinx-build", "-nW", "--keep-going", "-b", "html", "doc/", "doc/_build/html")
+
+
+# ---- used by sessions that "clean up" data for tests
+def clean_dir(dir_path):
+    """
+    "clean" a directory by removing all files
+    (that are not hidden)
+    without removing the directory itself
+    """
+    dir_path = pathlib.Path(dir_path)
+    dir_contents = dir_path.glob('*')
+    for content in dir_contents:
+        if content.is_dir():
+            shutil.rmtree(content)
+        else:
+            if content.name.startswith('.'):
+                # e.g., .gitkeep file we don't want to delete
+                continue
+            content.unlink()
+
+
+DATA_FOR_TESTS_DIR = './tests/data-for-tests/'
+SOURCE_TEST_DATA_DIR = f"{DATA_FOR_TESTS_DIR}source/"
+SOURCE_TEST_DATA_DIRS = [
+    dir_ for dir_
+    in sorted(pathlib.Path(SOURCE_TEST_DATA_DIR).glob('*/'))
+    if dir_.is_dir()
+]
+
+
+@nox.session(name='test-data-clean-source')
+def test_data_clean_source(session) -> None:
+    """
+    Clean (remove) 'source' test data, used by TEST_DATA_GENERATE_SCRIPT.
+    """
+    clean_dir(SOURCE_TEST_DATA_DIR)
+
+
+SOURCE_TEST_DATA_URL = 'https://osf.io/z6pf4/download'
+SOURCE_TEST_DATA_TAR = f'{SOURCE_TEST_DATA_DIR}source-test-data.tar.gz'
+
+
+@nox.session(name='test-data-tar-source')
+def test_data_tar_source(session) -> None:
+    """
+    Make a .tar.gz file of just the source test data used to run tests on CI.
+    """
+    session.log(f"Making tarfile with source data: {SOURCE_TEST_DATA_TAR}")
+    session.run("python", "./tests/scripts/make_source_test_data.py")
+
+
+@nox.session(name='test-data-download-source')
+def test_data_download_source(session) -> None:
+    """
+    Download and extract a .tar.gz file of 'source' test data, used by TEST_DATA_GENERATE_SCRIPT.
+    """
+    session.log(f'Downloading: {SOURCE_TEST_DATA_URL}')
+    urllib.request.urlretrieve(SOURCE_TEST_DATA_URL, SOURCE_TEST_DATA_TAR)
+    session.log(f'Extracting downloaded tar: {SOURCE_TEST_DATA_TAR}')
+    shutil.unpack_archive(filename=SOURCE_TEST_DATA_TAR, extract_dir=SOURCE_TEST_DATA_DIR, format="gztar")
