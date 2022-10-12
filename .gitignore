@@ -16,6 +16,10 @@
 dist/
 build/
 
+# downloaded pcb data
+data/pcb_data.tar.gz
+data/pcb_data/
+
 # test data
 tests/data-for-tests/source/source-test-data.tar.gz
 tests/data-for-tests/source/song_data/
