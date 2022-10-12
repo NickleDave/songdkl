@@ -39,6 +39,7 @@ test = [
 dev = [
     "flit",
     "twine",
+    "songdkl[test, doc]",
 ]
 doc = [
     "jupyterlab >=3.0.3",
