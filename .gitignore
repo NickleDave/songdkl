@@ -17,6 +17,5 @@ dist/
 build/
 
 # test data
-tests/data-for-tests/song_data/
-tests/data-for-tests/hum_data/
-tests/data-for-tests/generated/*txt
+tests/data-for-tests/source/source-test-data.tar.gz
+tests/data-for-tests/source/song_data/
