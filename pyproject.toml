@@ -51,3 +51,9 @@ songdkl = 'songdkl.__main__:main'
 
 [project.urls]
 Home = "https://github.com/NickleDave/songdkl"
+
+
+[tool.pytest.ini_options]
+markers = [
+    "smoke: quick tests to check if anything is broken (because its 'smoking')",
+]
