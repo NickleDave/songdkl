@@ -1,5 +1,5 @@
 # songdkl
-
+[![Continuous Integration Status](https://github.com/NickleDave/songdkl/actions/workflows/ci.yml/badge.svg)](https://github.com/NickleDave/songdkl/actions/workflows/ci.yml/badge.svg)
 ## About
 automated quantitation of vocal learning in the songbird
 
