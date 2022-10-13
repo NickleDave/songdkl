@@ -4,9 +4,9 @@ from .songdkl import calculate
 from .numsyls import numsyls
 
 
-def main():
+def main(argv=None):
     parser = argparser.get()
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.command == 'calculate':
         score1, score2, n_psds_ref, n_psds_compare = calculate(ref_dir_path=args.ref_dir_path,

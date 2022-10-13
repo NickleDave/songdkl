@@ -29,10 +29,8 @@ def norm(arr: np.ndarray) -> np.ndarray:
     normed : numpy.ndarray
         ``arr`` with
     """
-    # replace use of ``np.average`` with ``np.mean``
-    # since ``np.average`` calls ``np.mean`` anyways,
-    # and we are not using weighting that ``np.average`` provides
-    return (np.array(arr) - arr.mean()) / np.std(arr)
+    arr = np.array(arr)
+    return (arr - arr.mean()) / arr.std()
 
 
 @dataclasses.dataclass
@@ -51,7 +49,7 @@ class SyllablesFromWav:
     rate : int
         Sampling rate of .wav file.
     """
-    syls: list
+    syls: list[np.ndarray]
     rate: int
 
 

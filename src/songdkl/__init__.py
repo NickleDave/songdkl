@@ -11,4 +11,8 @@ from .__about__ import (
 )
 
 from .songdkl import calculate
-from . import numsyls
+from . import (
+    audio,
+    numsyls,
+    syllables
+)

@@ -140,5 +140,5 @@ def threshold(a: np.ndarray, thresh: int | float | None = None) -> np.ndarray:
 
     By default threshold is sigma."""
     if thresh is None:
-        thresh = scipy.std(a)
+        thresh = a.std()
     return np.where(abs(a) > thresh, a, np.zeros(a.shape))
