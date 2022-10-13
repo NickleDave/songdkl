@@ -1,3 +1,5 @@
+import shutil
+
 import pytest
 
 import songdkl
@@ -13,12 +15,13 @@ def test_em_of_gmm_cluster(list_of_wav_paths):
 
 
 @pytest.mark.smoke
-@pytest.mark.parametrize(
-    'dir_path',
-    [
-        './tests/data-for-tests/source/song_data/bk1bk3'
-    ]
-)
-def test_numsyls(dir_path):
-    n_syls = songdkl.numsyls.numsyls(dir_path=dir_path)
+def test_numsyls(list_of_wav_paths, tmp_path):
+    tmp_dir_path = tmp_path / 'bk1bk3'
+    tmp_dir_path.mkdir(exist_ok=True)
+    wav_paths = list_of_wav_paths[:4]  # shorten to make smoke test quick
+    for wav_path in wav_paths:
+        shutil.copy(wav_path, tmp_dir_path)
+
+    n_syls = songdkl.numsyls.numsyls(dir_path=tmp_dir_path)
+
     assert isinstance(n_syls, int)
