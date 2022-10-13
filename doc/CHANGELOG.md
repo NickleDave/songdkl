@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Add scripts to download Dryad dataset
+  [#53](https://github.com/NickleDave/songdkl/pull/53).
+  Fixed [#50](https://github.com/NickleDave/songdkl/issues/50)
+  and [#10](https://github.com/NickleDave/songdkl/issues/10).
+- Add "source" data for tests (subset of Dryad dataset) +
+  dev tooling to recreate this subset, download it for tests,
+  etc. [#53](https://github.com/NickleDave/songdkl/pull/53)
+  Fixed [#50](https://github.com/NickleDave/songdkl/issues/50)
+  and [#10](https://github.com/NickleDave/songdkl/issues/10).
+
+## [0.2.0b1]
+### Added
 - Add .csv files from original Dryad dataset
   and provided by [David Mets](https://github.com/dgmets) for testing
   [#43](https://github.com/NickleDave/songdkl/pull/43).
@@ -14,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Refactor/revise codebase for readability
   [#46](https://github.com/NickleDave/songdkl/pull/46).
-  Also add/revise docstrings, type annotations. 
+  Also add/revise docstrings, type annotations.
   Fixes [#21](https://github.com/NickleDave/songdkl/issues/21),
   [#23](https://github.com/NickleDave/songdkl/issues/23),
   and [#24](https://github.com/NickleDave/songdkl/issues/24).
