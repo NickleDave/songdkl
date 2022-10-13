@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add initial suite of unit tests, using `pytest`
   [#54](https://github.com/NickleDave/songdkl/pull/54).
   Fixes [#17](https://github.com/NickleDave/songdkl/issues/17).
+- Set up continuous integration
+  [#55](https://github.com/NickleDave/songdkl/pull/55).
+  Fixes [#6](https://github.com/NickleDave/songdkl/issues/6).
 
 ## [0.2.0b1]
 ### Added
