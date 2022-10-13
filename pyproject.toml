@@ -31,19 +31,19 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = [
+tests = [
     "pytest >= 6.2.1",
     "pytest-cov >=2.12.0",
     "pytest-console-scripts >= 1.3.1",
 ]
+docs = [
+    "jupyterlab >=3.0.3",
+    "Sphinx >= 3.4.1",
+]
 dev = [
     "flit",
     "twine",
-    "songdkl[test, doc]",
-]
-doc = [
-    "jupyterlab >=3.0.3",
-    "Sphinx >= 3.4.1",
+    "songdkl[tests, docs]",
 ]
 
 [project.scripts]
