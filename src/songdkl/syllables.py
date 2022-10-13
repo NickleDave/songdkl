@@ -51,7 +51,7 @@ class SyllablesFromWav:
     rate : int
         Sampling rate of .wav file.
     """
-    syls: list
+    syls: list[np.ndarray]
     rate: int
 
 
