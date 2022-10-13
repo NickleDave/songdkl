@@ -1,4 +1,6 @@
 """run when songdkl is called from the command-line, e.g. '$ songdkl --help'"""
+from __future__ import annotations
+
 from . import argparser
 from .songdkl import calculate
 from .numsyls import numsyls

@@ -1,4 +1,5 @@
 """functions to estimate the number of syllables in a bird's song"""
+from __future__ import annotations
 import pathlib
 
 import numpy as np

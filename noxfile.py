@@ -53,11 +53,11 @@ def dev(session: nox.Session) -> None:
 
 
 @nox.session
-def test(session) -> None:
+def tests(session) -> None:
     """
     Run the unit and regular tests.
     """
-    session.install(".[test]")
+    session.install(".[tests]")
     session.run("pytest", *session.posargs)
 
 
@@ -66,14 +66,14 @@ def coverage(session) -> None:
     """
     Run the unit and regular tests, and save coverage report
     """
-    session.install(".[test]", "pytest-cov")
+    session.install(".[tests]", "pytest-cov")
     session.run(
         "pytest", "--cov=./", "--cov-report=xml", *session.posargs
     )
 
 
 @nox.session
-def doc(session: nox.Session) -> None:
+def docs(session: nox.Session) -> None:
     """
     Build the docs.
 
@@ -85,7 +85,7 @@ def doc(session: nox.Session) -> None:
 
     Otherwise the docs will be built once using
     """
-    session.install(".[doc]")
+    session.install(".[docs]")
     if session.posargs:
         if "autobuild" in session.posargs:
             print("Building docs at http://127.0.0.1:8000 with sphinx-autobuild -- use Ctrl-C to quit")
