@@ -76,7 +76,7 @@ def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFro
     syls_from_wavs = []
     for wav_path in wav_paths:
         rate, data = audio.load_wav(wav_path)
-        syls_this_wav, slices_this_wav = audio.getsyls(data, rate)
+        syls_this_wav, slices_this_wav, threshold_value = audio.get_syllable_clips_from_audio(data, rate)
         syls_from_wavs.append(
             SyllablesFromWav(syls=syls_this_wav, rate=rate)
         )
