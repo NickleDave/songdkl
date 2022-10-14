@@ -6,6 +6,7 @@ import scipy
 import scipy.signal
 from scipy.io import wavfile
 from scipy import ndimage
+from skimage.filters import threshold_otsu
 
 
 def load_wav(wav_path: str | pathlib.Path) -> (int, np.array):
@@ -61,9 +62,8 @@ def smoothrect(data: np.ndarray,
     return smooth
 
 
-# TODO: add option to use scikit-image implementation of Otsu's method
-# https://github.com/NickleDave/songdkl/issues/37
-def findobject(arr: np.ndarray) -> list[tuple[slice]]:
+def findobject(arr: np.ndarray,
+               thresh: str | float | int = 'half-otsu') -> list[tuple[slice]]:
     """Segment audio into syllables
     using ``scipy.ndimage.find_objects``.
     Expects a smoothed rectified amplitude envelope,
@@ -74,6 +74,16 @@ def findobject(arr: np.ndarray) -> list[tuple[slice]]:
     arr : numpy.ndarray
         Containing smoothed rectified amplitude envelope
         from a .wav file.
+    thresh : str, float, int
+        Thresholding method.
+        If a string, one of {'half-otsu', 'half-average'}.
+        When ``threshold='half-otsu'`` then Otsu's method
+        is used to find the threshold,
+        and half this value is used.
+        When ``threshold='half-average'``, then
+        the threshold is set to half the average of ``arr``.
+        Float or int values will be used directly
+        as the threshold. Default is 'half-otsu'.
 
     Returns
     -------
@@ -82,9 +92,20 @@ def findobject(arr: np.ndarray) -> list[tuple[slice]]:
         the segments identified by
         ``scipy.ndimage.find_objects``.
     """
-    # heuristic way of establishing threshold
-    value = (np.average(arr)) / 2
-    thresh = threshold(arr, value)  # threshold the envelope data
+    if thresh == 'otsu':
+        thresh_val = threshold_otsu(arr) / 2
+    elif thresh == 'half-average':
+        # heuristic way of establishing threshold
+        thresh_val = (np.average(arr)) / 2
+    elif isinstance(thresh, float) or isinstance(thresh, int):
+        thresh_val = thresh
+    else:
+        raise ValueError(
+            "'thresh` must be {'otsu', 'half-average'} or a float or int value,"
+            f"but was: {thresh}"
+        )
+
+    thresh = threshold(arr, thresh_val)  # threshold the envelope data
     thresh = threshold(ndimage.convolve(thresh, np.ones(512)), 0.5)  # pad the threshold
     label = (ndimage.label(thresh)[0])  # label objects in the threshold
     objs = ndimage.find_objects(label)  # recover object positions
