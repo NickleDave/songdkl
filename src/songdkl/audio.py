@@ -92,7 +92,7 @@ def findobject(arr: np.ndarray,
         the segments identified by
         ``scipy.ndimage.find_objects``.
     """
-    if thresh == 'otsu':
+    if thresh == 'half-otsu':
         thresh_val = threshold_otsu(arr) / 2
     elif thresh == 'half-average':
         # heuristic way of establishing threshold
@@ -101,7 +101,7 @@ def findobject(arr: np.ndarray,
         thresh_val = thresh
     else:
         raise ValueError(
-            "'thresh` must be {'otsu', 'half-average'} or a float or int value,"
+            "'thresh` must be {'half-otsu', 'half-average'} or a float or int value,"
             f"but was: {thresh}"
         )
 
