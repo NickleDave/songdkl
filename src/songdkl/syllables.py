@@ -74,12 +74,42 @@ def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFro
         are taken from.
     """
     syls_from_wavs = []
+    slices_from_wavs = []
+    threshold_vals = []
     for wav_path in wav_paths:
         rate, data = audio.load_wav(wav_path)
-        syls_this_wav, slices_this_wav = audio.getsyls(data, rate)
+        syls_this_wav, slices_this_wav, threshold_value = audio.getsyls(data, rate)
         syls_from_wavs.append(
             SyllablesFromWav(syls=syls_this_wav, rate=rate)
         )
+        slices_from_wavs.append(slices_this_wav)
+        threshold_vals.append(threshold_value)
+
+    # ---- sticking in chunk of code to
+    csv = []
+    for ind, filename in enumerate(wav_paths):
+        for slice_tup in slices_from_wavs[ind]:
+            slice_ = slice_tup[0]  # [0][0] because we get back tuples of (slice, None)
+            csv.append([ind, filename, slice_.start, slice_.stop])  # one row of csv
+
+    csv = np.array(csv, dtype=np.object)
+    bird_id = wav_paths[0].parent.name
+    fname = bird_id + '-py-pkg-slices.csv'
+    csv_path = './tests/data-for-tests/generated/' + fname
+
+    np.savetxt(
+        csv_path,
+        csv,
+        fmt=['%u', '%s', '%u', '%u'],
+        delimiter=",",
+        header="filenum,filename,start,stop"
+    )
+
+    threshold_vals = np.array(threshold_vals)
+    np.save('./tests/data-for-tests/generated/' + bird_id + '-threshold-vals-py-pkg.npy', threshold_vals)
+
+    quit()
+
     return syls_from_wavs
 
 

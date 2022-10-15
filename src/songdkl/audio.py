@@ -88,7 +88,7 @@ def findobject(arr: np.ndarray) -> list[tuple[slice]]:
     thresh = threshold(ndimage.convolve(thresh, np.ones(512)), 0.5)  # pad the threshold
     label = (ndimage.label(thresh)[0])  # label objects in the threshold
     objs = ndimage.find_objects(label)  # recover object positions
-    return objs
+    return objs, value
 
 
 def getsyls(data: np.ndarray,
@@ -119,7 +119,7 @@ def getsyls(data: np.ndarray,
         of tuples of slices.
     """
     data_filtered = filtersong(data)
-    slices = findobject(smoothrect(data_filtered, 10, rate))
+    slices, threshold_value = findobject(smoothrect(data_filtered, 10, rate))
 
     # get objects of sufficient duration
     frqs = rate / 1000  # calculate length of a ms in samples
@@ -131,7 +131,7 @@ def getsyls(data: np.ndarray,
     else:
         syllables = [x for x in [data[slice_] for slice_ in slices]]
 
-    return syllables, slices
+    return syllables, slices, threshold_value
 
 
 def threshold(a: np.ndarray, thresh: int | float | None = None) -> np.ndarray:
