@@ -177,6 +177,25 @@ for file in fils1:
     objss1.append(objs)
     syls1.append([frq] + syls)
 
+csv = []
+for ind, filename in enumerate(fils1):
+    for slice_tup in objss1[ind]:
+        slice_ = slice_tup[0]  # [0][0] because we get back tuples of (slice, None)
+        csv.append([ind, filename, slice_.start, slice_.stop])  # one row of csv
+
+csv = np.array(csv, dtype=np.object)
+bird_id = path1.split("/")[-2]
+fname = bird_id + '-pcb-script-slices.csv'
+csv_path = './tests/data-for-tests/generated/' + fname
+
+np.savetxt(
+    csv_path,
+    csv,
+    fmt=['%u', '%s', '%u', '%u'],
+    delimiter=",",
+    header="filenum,filename,start,stop"
+)
+
 # convert syllables so PSDs
 segedpsds1 = []
 for x in syls1[:datano]:
