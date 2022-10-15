@@ -94,7 +94,7 @@ def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFro
 
     csv = np.array(csv, dtype=np.object)
     bird_id = wav_paths[0].parent.name
-    fname = bird_id + '-py-pkg-slices.csv'
+    fname = bird_id + '-py-pkg-skimage-otsu-slices.csv'
     csv_path = './tests/data-for-tests/generated/' + fname
 
     np.savetxt(
