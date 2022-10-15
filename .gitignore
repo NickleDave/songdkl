@@ -23,3 +23,5 @@ data/pcb_data/
 # test data
 tests/data-for-tests/source/source-test-data.tar.gz
 tests/data-for-tests/source/song_data/
+tests/data-for-tests/generated/*.csv
+tests/data-for-tests/generated/*.txt
