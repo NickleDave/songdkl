@@ -73,7 +73,7 @@ def findobject(file):
     thresh = threshold(sc.ndimage.convolve(thresh, np.ones(512)), 0.5)  # pad the threshold
     label = (sc.ndimage.label(thresh)[0])  # label objects in the threshold
     objs = sc.ndimage.find_objects(label)  # recover object positions
-    return (objs)
+    return (objs), value
 
 
 def smoothrect(a, window=None, freq=None):
@@ -94,10 +94,10 @@ def getsyls(a):
     frq = a[1]  # get sampling frequency from data (a)
     a = a[0]  # get data from data (a)
     frqs = frq / 1000  # calcualte length of a ms in samples
-    objs = findobject(smoothrect(fa[0], 10, frq))  # get syllable positions
+    objs, threshold_val = findobject(smoothrect(fa[0], 10, frq))  # get syllable positions
     sylables = [x for x in [a[y] for y in objs] if int(len(x)) > (10 * frqs)]  # get syllable dat$
     objs = [y for y in objs if int(len(a[y])) > 10 * frqs]  # get objects of sufficient duraiton
-    return sylables, objs, frq
+    return sylables, objs, frq, threshold_val
 
 
 def chunks(l, n):
@@ -170,12 +170,14 @@ datano = 15000  # maximum number of syllables to be analyzed
 # get syllables from all of the songs in folder
 syls1 = []
 objss1 = []
+threshold_vals = []
 for file in fils1:
     song = impwav(path1 + file)
     if len(song[0]) < 1: break
-    syls, objs, frq = (getsyls(song))
+    syls, objs, frq, threshold_val = (getsyls(song))
     objss1.append(objs)
     syls1.append([frq] + syls)
+    threshold_vals.append(threshold_val)
 
 csv = []
 for ind, filename in enumerate(fils1):
@@ -195,6 +197,9 @@ np.savetxt(
     delimiter=",",
     header="filenum,filename,start,stop"
 )
+
+threshold_vals = np.array(threshold_vals)
+np.save('./tests/data-for-tests/generated/' + bird_id + '-threshold-vals-pcb-script.npy', threshold_vals)
 
 # convert syllables so PSDs
 segedpsds1 = []
