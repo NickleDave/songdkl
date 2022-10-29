@@ -109,7 +109,7 @@ def findobject(arr: np.ndarray,
     thresh = threshold(ndimage.convolve(thresh, np.ones(512)), 0.5)  # pad the threshold
     label = (ndimage.label(thresh)[0])  # label objects in the threshold
     objs = ndimage.find_objects(label)  # recover object positions
-    return objs, value
+    return objs, thresh_val
 
 
 def getsyls(data: np.ndarray,
