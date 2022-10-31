@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set up continuous integration
   [#55](https://github.com/NickleDave/songdkl/pull/55).
   Fixes [#6](https://github.com/NickleDave/songdkl/issues/6).
+- Add functionality to find threshold for segmenting audio with 
+  Otsu's method, as implemented in scikit-image
+  [#58](https://github.com/NickleDave/songdkl/pull/58).
+  Fixes [#37](https://github.com/NickleDave/songdkl/issues/37).
 
 ## [0.2.0b1]
 ### Added
