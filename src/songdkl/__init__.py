@@ -10,9 +10,14 @@ from .__about__ import (
     __version__,
 )
 
-from .songdkl import calculate
 from . import (
     audio,
+    constants,
+    load,
+    logging,
     numsyls,
-    syllables
+    prep,
+    songdkl,
+    syllables,
+    timenow,
 )
