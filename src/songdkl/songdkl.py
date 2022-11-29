@@ -1,5 +1,6 @@
 """functions to compute song divergence"""
 from __future__ import annotations
+import logging
 import pathlib
 from typing import Any, Tuple, Union
 
@@ -11,6 +12,9 @@ from .syllables import (
     convert_syl_to_psd,
     get_all_syls,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 def calculate(ref_dir_path: str | pathlib.Path,
@@ -65,6 +69,10 @@ def calculate(ref_dir_path: str | pathlib.Path,
     n_psd_compare : int
         Number of PDSs used from comparison data set.
     """
+    logger.log(
+        msg=f'Preparing dataset from ref_dir_path and compare_dir_path',
+        level=logging.INFO
+    )
     wav_paths_ref = sorted(pathlib.Path(ref_dir_path).glob('*.wav'))
     wav_paths_compare = sorted(pathlib.Path(compare_dir_path).glob('*.wav'))
 
@@ -92,6 +100,11 @@ def calculate(ref_dir_path: str | pathlib.Path,
     len_ref_half = int(len(segedpsds_ref) / 2)
     len_compare_half = int(len(segedpsds_compare) / 2)
 
+    logger.log(
+        msg=f'Calculating distance matrices',
+        level=logging.INFO
+    )
+
     # calculate distance matrices
     D_ref = spatial.distance.cdist(segedpsds_ref[:len_ref_half], basis_set, 'sqeuclidean')
     D_ref_2 = spatial.distance.cdist(segedpsds_ref[len_ref_half:], basis_set, 'sqeuclidean')
@@ -100,12 +113,19 @@ def calculate(ref_dir_path: str | pathlib.Path,
 
     mx = np.max([np.max(D_ref), np.max(D_compare), np.max(D_ref_2), np.max(D_compare_2)])
 
+    logger.log(
+        msg='Converting to similarity matrices',
+        level=logging.INFO
+    )
     # convert to similarity matrices
     s_ref = 1 - (D_ref / mx)
     s_ref_2 = 1 - (D_ref_2 / mx)
     s_compare = 1 - (D_compare / mx)
     s_compare_2 = 1 - (D_compare_2 / mx)
 
+    logger.info(
+        msg=f'Fitting Gaussian Mixture Models',
+    )
     # estimate GMMs
     P = GaussianMixture(n_components=k_ref, max_iter=100000, n_init=5, covariance_type='full')
     P.fit(s_ref)
@@ -113,6 +133,10 @@ def calculate(ref_dir_path: str | pathlib.Path,
     Q = GaussianMixture(n_components=k_compare, max_iter=100000, n_init=5, covariance_type='full')
     Q.fit(s_compare)
 
+    logger.log(
+        msg=f'Calculating likelihoods for held out data',
+        level=logging.INFO
+    )
     # calculate likelihoods for held out data
     p_hat_p = P.score(s_ref_2)
     q_hat_p = Q.score(s_ref_2)
@@ -120,6 +144,10 @@ def calculate(ref_dir_path: str | pathlib.Path,
     p_hat_q = P.score(s_compare_2)
     q_hat_q = Q.score(s_compare_2)
 
+    logger.log(
+        msg=f'Calculating Song_D_KL, divergence estimate',
+        level=logging.INFO
+    )
     # calculate song divergence (DKL estimate)
     DKL_PQ = np.log2(np.e) * ((np.mean(p_hat_p)) - (np.mean(q_hat_p)))
     DKL_QP = np.log2(np.e) * ((np.mean(q_hat_q)) - (np.mean(p_hat_q)))
