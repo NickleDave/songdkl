@@ -1,14 +1,24 @@
 """run when songdkl is called from the command-line, e.g. '$ songdkl --help'"""
 from __future__ import annotations
+import logging
 
 from . import argparser
 from .songdkl import calculate
 from .numsyls import numsyls
 
 
+from .logging import config_logging_for_cli, log_version
+
+
+logger = logging.getLogger(__name__)
+
+
 def main(argv=None):
     parser = argparser.get()
     args = parser.parse_args(argv)
+
+    config_logging_for_cli()
+    log_version(logger)
 
     if args.command == 'calculate':
         score1, score2, n_psds_ref, n_psds_compare = calculate(ref_dir_path=args.ref_dir_path,

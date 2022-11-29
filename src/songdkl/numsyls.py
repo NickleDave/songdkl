@@ -1,8 +1,10 @@
 """functions to estimate the number of syllables in a bird's song"""
 from __future__ import annotations
+import logging
 import pathlib
 
 import numpy as np
+import rich.progress
 from sklearn.mixture import GaussianMixture
 import scipy.spatial
 
@@ -10,6 +12,9 @@ from .syllables import (
     convert_syl_to_psd,
     get_all_syls,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 def em_of_gmm_cluster(segedpsds: list,
@@ -76,11 +81,16 @@ def em_of_gmm_cluster(segedpsds: list,
         basis_set = [segedpsds[ind]
                      for ind in np.random.randint(0, len(segedpsds), size=n_basis)]
 
+    logger.log(
+        msg=f'Computing distances',
+        level=logging.INFO
+    )
+
     D = scipy.spatial.distance.cdist(segedpsds, basis_set, 'sqeuclidean')
     s = 1 - D / np.max(D) * 1000
     bics = []
     n_components_list = list(range(min_components, max_components))
-    for n_components in n_components_list:
+    for n_components in rich.progress.track(n_components_list, 'Fitting components'):
         if n_splits > 1:
             split_bics = []
             splits = np.array_split(s, n_splits)
@@ -122,10 +132,19 @@ def numsyls(dir_path: str | pathlib.Path,
         that produced the fit Gaussian Mixture Model
         with the lowest Bayesian Information Criterion.
     """
+    logger.log(
+        msg=f'Preparing dataset from dir_path',
+        level=logging.INFO
+    )
     wav_paths = sorted(pathlib.Path(dir_path).glob('*.wav'))
     wav_paths = wav_paths[:max_wavs]
 
     syls_from_wavs = get_all_syls(wav_paths)
     segedpsds = convert_syl_to_psd(syls_from_wavs, max_num_psds)
+
+    logger.log(
+        msg=f'Identifying best number of mixtures to describe the data',
+        level=logging.INFO
+    )
     sylno_bic = em_of_gmm_cluster(segedpsds)
     return sylno_bic
