@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Otsu's method, as implemented in scikit-image
   [#58](https://github.com/NickleDave/songdkl/pull/58).
   Fixes [#37](https://github.com/NickleDave/songdkl/issues/37).
+- Add logging and progress bars
+  [#60](https://github.com/NickleDave/songdkl/pull/60).
+  Fixes [#22](https://github.com/NickleDave/songdkl/issues/22).
 
 ## [0.2.0b1]
 ### Added
