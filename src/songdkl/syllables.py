@@ -10,6 +10,7 @@ from typing import Optional
 
 import matplotlib.mlab
 import numpy as np
+import rich.progress
 
 from . import audio
 
@@ -74,7 +75,7 @@ def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFro
         are taken from.
     """
     syls_from_wavs = []
-    for wav_path in wav_paths:
+    for wav_path in rich.progress.track(wav_paths, description='Getting syllables from .wav files'):
         rate, data = audio.load_wav(wav_path)
         syls_this_wav, slices_this_wav, threshold_value = audio.get_syllable_clips_from_audio(data, rate)
         syls_from_wavs.append(
@@ -104,7 +105,7 @@ def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
         PSDs from segmented syllables.
     """
     segedpsds = []
-    for syls_from_wav in syls_from_wavs:
+    for syls_from_wav in rich.progress.track(syls_from_wavs, description='Converting syllables to PSDs'):
         fs = syls_from_wav.rate
         nfft = int(round(2 ** 14 / 32000.0 * fs))
         segstart = int(round(600 / (fs / float(nfft))))
