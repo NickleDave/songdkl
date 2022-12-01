@@ -7,7 +7,6 @@ has already been run.
 """
 import pathlib
 import shutil
-import time
 
 
 PCB_SONG_DATA_ROOT = pathlib.Path("./data/pcb_data/song_data")
