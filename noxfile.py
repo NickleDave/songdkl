@@ -117,7 +117,7 @@ def clean_dir(dir_path):
 
 DATA_FOR_TESTS_DIR = pathlib.Path('./tests/data-for-tests/')
 SOURCE_TEST_DATA_DIR = DATA_FOR_TESTS_DIR / 'source'
-SOURCE_TEST_DATA_DIRS = [
+SOURCE_TEST_DATA_SUBDIRS = [
     dir_ for dir_
     in sorted(SOURCE_TEST_DATA_DIR.glob('*/'))
     if dir_.is_dir()
@@ -129,22 +129,24 @@ def test_data_clean_source(session) -> None:
     """
     Clean (remove) 'source' test data, used by TEST_DATA_GENERATE_SCRIPT.
     """
-    session.log(
-        f'Cleaning source test data: {SOURCE_TEST_DATA_DIR}'
-    )
-    clean_dir(SOURCE_TEST_DATA_DIR)
+    for source_test_data_subdir in SOURCE_TEST_DATA_SUBDIRS:
+        session.log(
+            f'Cleaning source test data: {source_test_data_subdir}'
+        )
+        clean_dir(source_test_data_subdir)
 
 
 SOURCE_TEST_DATA_URL = 'https://osf.io/z6pf4/download'
 SOURCE_TEST_DATA_TAR = f'{SOURCE_TEST_DATA_DIR}source-test-data.tar.gz'
 
 
-@nox.session(name='test-data-tar-source')
-def test_data_tar_source(session) -> None:
+@nox.session(name='test-data-make-source')
+def test_data_make_source(session) -> None:
     """
-    Make a .tar.gz file of just the source test data used to run tests on CI.
+    Run script that makes 'source' data used for tests,
+    and makes a .tar.gz file of it, used to run tests on CI.
     """
-    session.log(f"Making tarfile with source data: {SOURCE_TEST_DATA_TAR}")
+    session.log(f"Making source data for tests: {SOURCE_TEST_DATA_TAR}")
     session.run("python", "./tests/scripts/make_source_test_data.py")
 
 
