@@ -20,6 +20,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add use of `dask` to parallelize data prep
   [#63](https://github.com/NickleDave/songdkl/pull/63).
   Fixes [#18](https://github.com/NickleDave/songdkl/issues/18).
+- Add cli options to control `numsyls` after refactoring it, 
+  and clean up other parameters so they all use dashes
+  [#66](https://github.com/NickleDave/songdkl/pull/63).
+  Fixes [#27](https://github.com/NickleDave/songdkl/issues/27).
+
+### Changed
+- Combine `numsyls` and `em_of_gmm_cluster` into a single function,
+  adding the `em_of_gmm_cluster` parameters to `numsyls` so a user 
+  can easily control them, e.g. through corresponding cli options
+  [#66](https://github.com/NickleDave/songdkl/pull/63).
+  Fixes [#64](https://github.com/NickleDave/songdkl/issues/64).
 
 ## [0.2.0]
 ### Added
