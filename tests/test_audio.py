@@ -100,9 +100,8 @@ def test_get_syllable_clips_from_audio_threshold_iou(threshold_method,
     PLOS Comp. Bio. scripts
     """
     wav_path = wav_path_from_all_song_data
-    bird_id = wav_path.parent.name
+    bird_id = wav_path.parent.name.split('-')[0]  # remove 'all' from name
     bird_slice_df = pcb_script_slice_df_factory(bird_id)
-
 
     rate, audio_arr = songdkl.audio.load_wav(wav_path)
     _, slices, _ = songdkl.audio.get_syllable_clips_from_audio(audio_arr,
