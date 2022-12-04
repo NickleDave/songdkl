@@ -71,7 +71,9 @@ def numsyls(psds_ref: np.ndarray,
     computed without splits.
     """
     logger.log(
-        msg=f'Identifying best number of components to describe the data',
+        msg=(f'Identifying best number of components to describe the data, psds_ref (shape: {psds_ref.shape}), '
+             f'with parameters n_basis={n_basis}, basis={basis}, '
+             f'min_components={min_components}, max_components={max_components}, n_splits={n_splits}.'),
         level=logging.INFO
     )
 
