@@ -91,7 +91,6 @@ def test_get_syllable_clips_from_audio(samp_freq_and_wav_data):
 def test_get_syllable_clips_from_audio_threshold_iou(threshold_method,
                                                      wav_path_from_all_song_data,
                                                      pcb_script_slice_df_factory,
-                                                     song_data_subdir_factory,
                                                      segmentation_iou_factory,
                                                      ):
     """Test that the segmentation
