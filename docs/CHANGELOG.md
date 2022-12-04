@@ -35,6 +35,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and provided by [David Mets](https://github.com/dgmets) for testing
   [#43](https://github.com/NickleDave/songdkl/pull/43).
   Fixes [#40](https://github.com/NickleDave/songdkl/issues/40).
+- Add functions to prepare data for `songdkl.calculate` 
+  and `numsyls.numsyls` functions, and save and load that data 
+  as numpy arrays. Also add a `prep` command to the cli that 
+  uses these functions 
+  [#62](https://github.com/NickleDave/songdkl/pull/62).
+  Fixes [#47](https://github.com/NickleDave/songdkl/issues/47),
+  [#25](https://github.com/NickleDave/songdkl/issues/25),
+  and [#19](https://github.com/NickleDave/songdkl/issues/19).
 
 ### Changed
 - Refactor/revise codebase for readability
