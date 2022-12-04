@@ -1,8 +1,6 @@
 import os
 import pathlib
 import shutil
-import tarfile
-import time
 import urllib.request
 
 import nox
