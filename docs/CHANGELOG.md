@@ -43,6 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Fixes [#47](https://github.com/NickleDave/songdkl/issues/47),
   [#25](https://github.com/NickleDave/songdkl/issues/25),
   and [#19](https://github.com/NickleDave/songdkl/issues/19).
+- Add use of `dask` to parallelize data prep
+  [#63](https://github.com/NickleDave/songdkl/pull/63).
+  Fixes [#18](https://github.com/NickleDave/songdkl/issues/18).
 
 ### Changed
 - Refactor/revise codebase for readability
