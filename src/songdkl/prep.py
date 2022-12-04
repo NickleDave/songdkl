@@ -31,13 +31,15 @@ def prep(dir_path: str | pathlib.Path,
         Maximum number of PSDs to compute. Default is 10k.
     """
     logger.log(
-        msg=f'Preparing dataset from dir_path: {dir_path}',
+        msg=f'Preparing dataset from dir_path: {dir_path}, '
+            f'with max_wavs={max_wavs} and max_num_psds={max_num_psds}.',
         level=logging.INFO
     )
     dir_path = pathlib.Path(dir_path)
 
     wav_paths = sorted(pathlib.Path(dir_path).glob('*.wav'))
-    wav_paths = wav_paths[:max_wavs]
+    if max_wavs:
+        wav_paths = wav_paths[:max_wavs]
 
     logger.log(
         msg=f'Segmenting .wav files to get syllables',
