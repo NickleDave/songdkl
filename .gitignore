@@ -20,6 +20,9 @@ build/
 data/pcb_data.tar.gz
 data/pcb_data/
 
+# result
+results/pcb_data/song_data/
+
 # test data
 tests/data-for-tests/source/source-test-data.tar.gz
 tests/data-for-tests/source/song_data/
