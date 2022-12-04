@@ -6,7 +6,6 @@ Used by both ``songdkl`` and ``numsyls`` modules.
 from __future__ import annotations
 import dataclasses
 import pathlib
-from typing import Optional
 
 import dask.bag
 import dask.diagnostics.progress
@@ -90,7 +89,7 @@ def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFro
 
 
 def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
-                       max_num_psds: Optional[int] = None
+                       max_num_psds: int | None = None
                        ) -> list[np.ndarray]:
     """Convert syllable segments to power spectral densities (PSDs).
 
