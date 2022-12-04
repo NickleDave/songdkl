@@ -8,9 +8,10 @@ import dataclasses
 import pathlib
 from typing import Optional
 
+import dask.bag
+import dask.diagnostics.progress
 import matplotlib.mlab
 import numpy as np
-import rich.progress
 
 from . import audio
 
@@ -54,7 +55,8 @@ class SyllablesFromWav:
     rate: int
 
 
-def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFromWav]:
+def get_all_syls(wav_paths: list[str] | list[pathlib.Path],
+                 n_partitions: int = 4) -> list[SyllablesFromWav]:
     """Get all syllables from a list of .wav files.
 
     Parameters
@@ -74,18 +76,23 @@ def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFro
         for the .wav file the syllables
         are taken from.
     """
-    syls_from_wavs = []
-    for wav_path in rich.progress.track(wav_paths, description='Getting syllables from .wav files'):
+    bag = dask.bag.from_sequence(wav_paths)
+
+    # for wav_path in rich.progress.track(wav_paths, description='Getting syllables from .wav files'):
+    def _syllabify(wav_path):
         rate, data = audio.load_wav(wav_path)
         syls_this_wav, slices_this_wav, threshold_value = audio.get_syllable_clips_from_audio(data, rate)
-        syls_from_wavs.append(
-            SyllablesFromWav(syls=syls_this_wav, rate=rate)
-        )
+        return SyllablesFromWav(syls=syls_this_wav, rate=rate)
+
+    with dask.diagnostics.progress.ProgressBar():
+        syls_from_wavs = bag.map(_syllabify).compute()
+
     return syls_from_wavs
 
 
 def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
-                       max_num_psds: Optional[int] = None) -> list[np.ndarray]:
+                       max_num_psds: Optional[int] = None
+                       ) -> list[np.ndarray]:
     """Convert syllable segments to power spectral densities (PSDs).
 
     Parameters
@@ -104,8 +111,9 @@ def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
         Of ``numpy.ndarray``,
         PSDs from segmented syllables.
     """
-    segedpsds = []
-    for syls_from_wav in rich.progress.track(syls_from_wavs, description='Converting syllables to PSDs'):
+    bag = dask.bag.from_sequence(syls_from_wavs)
+
+    def _to_psd(syls_from_wav):
         fs = syls_from_wav.rate
         nfft = int(round(2 ** 14 / 32000.0 * fs))
         segstart = int(round(600 / (fs / float(nfft))))
@@ -115,13 +123,16 @@ def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
             Pxx, _ = matplotlib.mlab.psd(norm(syl), NFFT=nfft, Fs=fs)
             psds.append(Pxx)
         spsds = [norm(psd[segstart:segend]) for psd in psds]
-        segedpsds.extend(spsds)
-        if max_num_psds:
-            if len(segedpsds) > max_num_psds:
-                break
+        return spsds
 
+    with dask.diagnostics.progress.ProgressBar():
+        segedpsds = bag.map(_to_psd).compute()
+    segedpsds = [
+        psd
+        for psd_list in segedpsds
+        for psd in psd_list
+    ]
     if max_num_psds:
         # since we are likely over `max_num_psds` even after `break` above
         segedpsds = segedpsds[:max_num_psds]
-
     return segedpsds

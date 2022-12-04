@@ -37,10 +37,9 @@ def test_SyllablesFromWav():
 
 @pytest.mark.smoke
 def test_get_all_syls(list_of_wav_paths):
-    wav_paths = list_of_wav_paths[:4]  # just need a short list for a smoke test
-    out = songdkl.syllables.get_all_syls(wav_paths)
+    out = songdkl.syllables.get_all_syls(list_of_wav_paths)
     assert isinstance(out, list)
-    assert len(out) == len(wav_paths)
+    assert len(out) == len(list_of_wav_paths)
     assert all(
         [isinstance(element, songdkl.syllables.SyllablesFromWav)
          for element in out]
@@ -49,8 +48,7 @@ def test_get_all_syls(list_of_wav_paths):
 
 @pytest.mark.smoke
 def test_convert_syl_to_psd(list_of_wav_paths):
-    wav_paths = list_of_wav_paths[:4]  # just need a short list for a smoke test
-    syls_from_wavs = songdkl.syllables.get_all_syls(wav_paths)
+    syls_from_wavs = songdkl.syllables.get_all_syls(list_of_wav_paths)
     psds = songdkl.syllables.convert_syl_to_psd(syls_from_wavs)
     assert isinstance(psds, list)
     assert all(
