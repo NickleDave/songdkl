@@ -55,8 +55,7 @@ class SyllablesFromWav:
     rate: int
 
 
-def get_all_syls(wav_paths: list[str] | list[pathlib.Path],
-                 n_partitions: int = 4) -> list[SyllablesFromWav]:
+def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFromWav]:
     """Get all syllables from a list of .wav files.
 
     Parameters
