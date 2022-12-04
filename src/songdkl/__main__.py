@@ -22,7 +22,17 @@ def main(argv=None):
     log_version(logger)
 
     if args.command == 'prep':
-        prep_and_save(dir_path=args.dir_path, output_dir_path=args.output_dir_path,
+        # handle edge case where user passes only one output dir,
+        # but argparse wraps in list because nargs='+'.
+        # We don't want `prep_and_save` responsible for catching it since this is a cli thing.
+        if args.output_dir_path is not None:
+            if len(args.output_dir_path) == 1:
+                output_dir_path = args.output_dir_path[0]
+            else:
+                output_dir_path = args.output_dir_path
+        else:
+            output_dir_path = None
+        prep_and_save(dir_path=args.dir_path, output_dir_path=output_dir_path,
                       max_wavs=args.max_wavs, max_num_psds=args.max_num_psds)
 
     elif args.command == 'calculate':
