@@ -4,7 +4,7 @@ from scipy.io import wavfile
 from .data import SONG_DATA_ROOT, SONG_DATA_SUBDIRS
 
 
-A_WAV_DIR = SONG_DATA_ROOT / 'bk1bk3'
+A_WAV_DIR = SONG_DATA_ROOT / 'bk1bk3-all'
 
 
 LIST_OF_WAV_PATHS = sorted(A_WAV_DIR.glob('*.wav'))
