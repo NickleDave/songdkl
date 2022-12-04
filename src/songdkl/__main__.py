@@ -3,8 +3,9 @@ from __future__ import annotations
 import logging
 
 from . import argparser
-from .songdkl import calculate
-from .numsyls import numsyls
+from .numsyls import numsyls_from_path
+from .prep import prep_and_save
+from .songdkl import calculate_from_path
 
 
 from .logging import config_logging_for_cli, log_version
@@ -20,26 +21,33 @@ def main(argv=None):
     config_logging_for_cli()
     log_version(logger)
 
-    if args.command == 'calculate':
-        score1, score2, n_psds_ref, n_psds_compare = calculate(ref_dir_path=args.ref_dir_path,
-                                                               compare_dir_path=args.compare_dir_path,
-                                                               k_ref=args.k_ref,
-                                                               k_compare=args.k_compare,
-                                                               max_wavs=args.max_wavs,
-                                                               max_num_psds=args.max_num_psds,
-                                                               n_basis=args.n_basis,
-                                                               basis=args.basis)
+    if args.command == 'prep':
+        prep_and_save(dir_path=args.dir_path, output_dir_path=args.output_dir_path,
+                      max_wavs=args.max_wavs, max_num_psds=args.max_num_psds)
+
+    elif args.command == 'calculate':
+        score1, score2, n_psds_ref, n_psds_compare = calculate_from_path(ref_path=args.ref_path,
+                                                                         compare_path=args.compare_path,
+                                                                         k_ref=args.k_ref,
+                                                                         k_compare=args.k_compare,
+                                                                         max_wavs=args.max_wavs,
+                                                                         max_num_psds=args.max_num_psds,
+                                                                         n_basis=args.n_basis,
+                                                                         basis=args.basis)
         print(
-            f'{args.ref_dir_path}\t{args.compare_dir_path}\t'
+            f'{args.ref_path}\t{args.compare_path}\t'
             f'{args.k_ref}\t{args.k_compare}\t'
             f'{args.n_basis}\t{score1}\t{score2}\t'
             f'{n_psds_ref}\t{n_psds_compare}'
         )
 
     elif args.command == 'numsyls':
-        n_syls = numsyls(dir_path=args.dir_path)
+        n_syls = numsyls_from_path(ref_path=args.ref_path,
+                                   max_wavs=args.max_wavs,
+                                   max_num_psds=args.max_num_psds,
+                                   )
         print(
-            f'{args.dir_path}\t{n_syls}'
+            f'{args.ref_path}\t{n_syls}'
         )
 
     elif args.command is None:

@@ -7,21 +7,36 @@ has already been run.
 """
 import pathlib
 import shutil
-import time
 
 
 PCB_SONG_DATA_ROOT = pathlib.Path("./data/pcb_data/song_data")
 SOURCE_TEST_DATA_ROOT_DIR = pathlib.Path("./tests/data-for-tests/source")
 SOURCE_TEST_DATA_DST = SOURCE_TEST_DATA_ROOT_DIR / "song_data"
 
-bird_ids = ('bk1bk3', 'bk1bk9')
-for bird_id in bird_ids:
-    src = PCB_SONG_DATA_ROOT / bird_id
-    dst = SOURCE_TEST_DATA_DST / bird_id
-    print(
-        f'copying {src} to {SOURCE_TEST_DATA_DST}'
-    )
-    shutil.copytree(src, dst)
+BIRD_IDS = ('bk1bk3', 'bk1bk9')
+# make 'small' versions of dataset so tests will run quicker
+DATASET_SIZES = ('small', 'all')
+N_WAVS_SMALL_DATASET = 5
+
+
+for dataset_size in DATASET_SIZES:
+    for bird_id in BIRD_IDS:
+        src = PCB_SONG_DATA_ROOT / bird_id
+        dst = SOURCE_TEST_DATA_DST / f'{bird_id}-{dataset_size}'
+
+        if dataset_size == 'all':
+            print(
+                f'Copying  {src} to {SOURCE_TEST_DATA_DST}\nas {dst.name}'
+            )
+            shutil.copytree(src, dst)
+        elif dataset_size == 'small':
+            print(
+                f'Copying small subset of {src} to {SOURCE_TEST_DATA_DST}\nas {dst.name}'
+            )
+            dst.mkdir(exist_ok=True, parents=True)
+            wavs = sorted(src.glob('*.wav'))
+            for wav in wavs[:N_WAVS_SMALL_DATASET]:
+                shutil.copy(wav, dst)
 
 
 print(

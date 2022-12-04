@@ -30,6 +30,7 @@ dependencies = [
     "rich >=12.5.1",
     "scikit-image >= 0.19.3",
     "scikit-learn >= 0.24.0",
+    "zarr >=2.13.3",
 ]
 
 [project.optional-dependencies]

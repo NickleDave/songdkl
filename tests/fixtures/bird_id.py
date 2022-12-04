@@ -1,9 +1,9 @@
 import pytest
 
-from .data import SONG_DATA_SUBDIRS
 
 TEST_DATA_BIRD_IDS = [
-    dir_.name for dir_ in SONG_DATA_SUBDIRS
+    'bk1bk3',
+    'bk1bk9',
 ]
 
 

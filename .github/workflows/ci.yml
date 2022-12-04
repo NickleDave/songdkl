@@ -20,7 +20,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: excitedleigh/setup-nox@v2.1.0
       - name: download test data
-        run: nox -s test-data-download-source
+        run: |
+          nox -s test-data-download-source
+          nox -s test-data-download-generated
       - name: run tests
         run: |
           pip install nox
