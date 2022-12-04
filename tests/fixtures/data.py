@@ -33,7 +33,7 @@ SONG_DATA_SUBDIRS = [
 ]
 
 
-BIRD_ID_SONG_DATA_SUBDIR_MAP = {
+SONG_DATA_SUBDIR_MAP = {
     dir_.name: dir_
     for dir_ in SONG_DATA_SUBDIRS
 }
@@ -41,10 +41,11 @@ BIRD_ID_SONG_DATA_SUBDIR_MAP = {
 
 @pytest.fixture
 def song_data_subdir_factory():
-    """Factory parameter that, given a bird ID,
-    returns the corresponding """
-    def _song_data_subdir_factory(bird_id):
-        return BIRD_ID_SONG_DATA_SUBDIR_MAP[bird_id]
+    """Factory parameter that,
+    given a bird ID and a dataset size,
+    returns the corresponding path"""
+    def _song_data_subdir_factory(bird_id, dataset_size):
+        return SONG_DATA_SUBDIR_MAP[f'{bird_id}-{dataset_size}']
     return _song_data_subdir_factory
 
 
