@@ -47,7 +47,7 @@ def dev(session: nox.Session) -> None:
 
     # Use the venv's interpreter to install the project along with
     # all it's dev dependencies, this ensures it's installed in the right way
-    session.run(python, "-m", "pip", "install", "-e", ".[dev,test,doc]", external=True)
+    session.run(python, "-m", "pip", "install", "-e", ".[dev]", external=True)
 
 
 @nox.session
