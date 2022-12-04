@@ -45,6 +45,11 @@ def main(argv=None):
         n_syls = numsyls_from_path(ref_path=args.ref_path,
                                    max_wavs=args.max_wavs,
                                    max_num_psds=args.max_num_psds,
+                                   n_basis=args.n_basis,
+                                   basis=args.basis,
+                                   min_components=args.min_components,
+                                   max_components=args.max_components,
+                                   n_splits=args.n_splits,
                                    )
         print(
             f'{args.ref_path}\t{n_syls}'

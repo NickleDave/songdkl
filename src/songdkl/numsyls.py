@@ -14,24 +14,24 @@ from .load import load_or_prep
 logger = logging.getLogger(__name__)
 
 
-def em_of_gmm_cluster(segedpsds: list,
-                      n_basis: int = 50,
-                      basis: str = 'first',
-                      min_components: int = 2,
-                      max_components: int = 22,
-                      n_splits: int = 1,
-                      ) -> int:
-    """Identifies the best number of mixtures to describe the data.
+def numsyls(psds_ref: np.ndarray,
+            n_basis: int = 50,
+            basis: str = 'first',
+            min_components: int = 2,
+            max_components: int = 22,
+            n_splits: int = 1,
+            ) -> int:
+    """Determine number of syllable classes in a bird's song.
 
-    Takes an array of segmented syllables, fits a series of
-    gaussian mixture models with an increasing number of mixtures,
-    and identifies the best number of mixtures to describe the data
-    by Bayesian Information Criterion (BIC).
+    Takes an array of PSDs from segmented syllables, fits them
+    with a series of Gaussian Mixture Models with an increasing
+    number of components, and then selects the number of components
+    that maximizes the Bayesian Information Criterion (BIC).
 
     Parameters
     ----------
-    segedpsds : list
-        Of ``numpy.ndarray``, PSDs of segmented syllables,
+    psds_ref : numpy.ndarray
+        PSDs of segmented syllables,
         returned by ``songdkl.songdkl.convert_syls_to_psd``.
     n_basis : int
         Number of syllables to use as basis set. Default is 50.
@@ -70,20 +70,27 @@ def em_of_gmm_cluster(segedpsds: list,
     human assessment or BIC values
     computed without splits.
     """
+    logger.log(
+        msg=(f'Identifying best number of components to describe the data, psds_ref (shape: {psds_ref.shape}), '
+             f'with parameters n_basis={n_basis}, basis={basis}, '
+             f'min_components={min_components}, max_components={max_components}, n_splits={n_splits}.'),
+        level=logging.INFO
+    )
+
     if basis == 'first':
         # select the first `n_basis` syllables of the reference song as the basis set
-        basis_set = segedpsds[:n_basis]
+        basis_set = psds_ref[:n_basis]
     elif basis == 'random':
         # select a random set of `n_basis` syllables as the basis set
-        basis_set = [segedpsds[ind]
-                     for ind in np.random.randint(0, len(segedpsds), size=n_basis)]
+        basis_set = [psds_ref[ind]
+                     for ind in np.random.randint(0, len(psds_ref), size=n_basis)]
 
     logger.log(
         msg=f'Computing distances',
         level=logging.INFO
     )
 
-    D = scipy.spatial.distance.cdist(segedpsds, basis_set, 'sqeuclidean')
+    D = scipy.spatial.distance.cdist(psds_ref, basis_set, 'sqeuclidean')
     s = 1 - D / np.max(D) * 1000
     bics = []
     n_components_list = list(range(min_components, max_components))
@@ -108,6 +115,11 @@ def em_of_gmm_cluster(segedpsds: list,
 def numsyls_from_path(ref_path: str | pathlib.Path,
                       max_wavs: int = 120,
                       max_num_psds: int = 10000,
+                      n_basis: int = 50,
+                      basis: str = 'first',
+                      min_components: int = 2,
+                      max_components: int = 22,
+                      n_splits: int = 1,
                       ) -> int:
     """Determine number of syllable classes in a bird's song,
     by fitting Gaussian Mixture Models to PSDs of segmented
@@ -124,6 +136,26 @@ def numsyls_from_path(ref_path: str | pathlib.Path,
         Maximum number of wav files to use. Default is 120.
     max_num_psds : int
         Maximum number of power spectral densities (PSDs) to calculate.
+    n_basis : int
+        Number of syllables to use as basis set. Default is 50.
+    basis : str
+        One of {'first', 'random'}.
+        Controls which syllables are used as the basis set.
+        If 'first', use the first `n_basis` syllables.
+        If `random`, grab a random set of size `n_basis`.
+        Default is 'first'.
+    min_components : int
+        Minimum number of components to consider
+        when fitting Gaussian Mixture Models. Default is 2.
+    max_components : int
+        Maximum number of components to consider
+        when fitting Gaussian Mixture Models. Default is 22.
+    n_splits : int
+        Number of splits to use when estimating components.
+        Default is 1, in which case ``psds_ref`` is not split.
+        If sufficient data are available,
+        a good rule of thumb is to use 3 splits.
+        See Notes below for more detail.
 
     Returns
     -------
@@ -137,38 +169,7 @@ def numsyls_from_path(ref_path: str | pathlib.Path,
         msg=f'Getting PSDs from ref_path: {ref_path}',
         level=logging.INFO
     )
-    segedpsds = load_or_prep(ref_path, max_wavs, max_num_psds)
+    psds_ref = load_or_prep(ref_path, max_wavs, max_num_psds)
 
-    logger.log(
-        msg=f'Identifying best number of mixtures to describe the data',
-        level=logging.INFO
-    )
-    sylno_bic = em_of_gmm_cluster(segedpsds)
-    return sylno_bic
-
-
-def numsyls(psds_ref: numpy.ndarray) -> int:
-    """Determine number of syllable classes in a bird's song,
-    by fitting Gaussian Mixture Models to PSDs of segmented
-    syllable renditions, and selecting the number of components
-    that maximizes the Bayesian Information Criterion.
-
-    Parameters
-    ----------
-    psds_ref : numpy.ndarray
-        Array of PSDs from bird that should be used as reference.
-
-    Returns
-    -------
-    sylno_bic : int
-        The estimated number of syllables, equal to
-        the number of components
-        that produced the fit Gaussian Mixture Model
-        with the lowest Bayesian Information Criterion.
-    """
-    logger.log(
-        msg=f'Identifying best number of mixtures to describe the data',
-        level=logging.INFO
-    )
-    sylno_bic = em_of_gmm_cluster(psds_ref)
+    sylno_bic = numsyls(psds_ref, n_basis, basis, min_components, max_components, n_splits)
     return sylno_bic

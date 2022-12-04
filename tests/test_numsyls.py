@@ -21,15 +21,6 @@ ZARR_PATH_TO_USE = ZARR_PATH_TO_USE[0]
 
 
 @pytest.mark.smoke
-def test_em_of_gmm_cluster(list_of_wav_paths):
-    wav_paths = list_of_wav_paths[:4]  # shorten to make smoke test quick
-    syls_from_wavs = songdkl.syllables.get_all_syls(wav_paths)
-    segedpsds = songdkl.syllables.convert_syl_to_psd(syls_from_wavs)
-    sylno_bic = songdkl.numsyls.em_of_gmm_cluster(segedpsds)
-    assert isinstance(sylno_bic, int)
-
-
-@pytest.mark.smoke
 def test_numsyls():
     array = zarr.load(ZARR_PATH_TO_USE)
     out = songdkl.numsyls.numsyls(array)
