@@ -59,3 +59,29 @@ The cli makes two commands available:
   `$ songdkl numsyls bird1_dir`
 
 For details on usage, please run `songdkl --help`.
+
+## Citation
+If you use this software, please cite the DOI:  
+[![DOI](https://zenodo.org/badge/157573537.svg)](https://zenodo.org/badge/latestdoi/157573537)
+
+Please also cite the original paper:
+Mets, David G., and Michael S. Brainard.  
+"An automated approach to the quantitation of vocalizations and vocal learning in the songbird."  
+PLoS computational biology 14.8 (2018): e1006437.  
+<https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006437&rev=2>
+```
+@article{mets2018automated,
+  title={An automated approach to the quantitation of vocalizations and vocal learning in the songbird},
+  author={Mets, David G and Brainard, Michael S},
+  journal={PLoS computational biology},
+  volume={14},
+  number={8},
+  pages={e1006437},
+  year={2018},
+  publisher={Public Library of Science San Francisco, CA USA}
+}
+```
+If you use the accompanying Dryad dataset, please cite that as well:  
+Mets, David G.; Brainard, Michael S. (2019), 
+Data from: An automated approach to the quantitation of vocalizations and vocal learning in the songbird., 
+Dryad, Dataset, <https://doi.org/10.5061/dryad.8tn4660>  
