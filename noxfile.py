@@ -134,7 +134,7 @@ def test_data_clean_source(session) -> None:
         clean_dir(source_test_data_subdir)
 
 
-SOURCE_TEST_DATA_URL = 'https://osf.io/z6pf4/download'
+SOURCE_TEST_DATA_URL = 'https://osf.io/qn6m3/download'
 SOURCE_TEST_DATA_TAR = f'{SOURCE_TEST_DATA_DIR}source-test-data.tar.gz'
 
 
@@ -187,6 +187,17 @@ def test_data_generated_make(session):
     )
 
 
-@nox.session(name='test-data-generated-download')
-def test_data_generated_download():
-    pass
+GENERATED_TEST_DATA_URL = 'https://osf.io/j6dgm/download'
+GENERATED_TEST_DATA_TAR = f'{GENERATED_TEST_DATA_DIR}generated-test-data.tar.gz'
+
+
+@nox.session(name='test-data-download-generated')
+def test_data_generated_download(session):
+    """
+    Download and extract a .tar.gz file of 'source' test data, used by TEST_DATA_GENERATE_SCRIPT.
+    """
+    session.log(f'Downloading: {GENERATED_TEST_DATA_URL}')
+    urllib.request.urlretrieve(GENERATED_TEST_DATA_URL, GENERATED_TEST_DATA_TAR)
+    session.log(f'Extracting downloaded tar: {GENERATED_TEST_DATA_TAR}')
+    shutil.unpack_archive(filename=GENERATED_TEST_DATA_TAR, extract_dir=GENERATED_TEST_DATA_DIR, format="gztar")
+
