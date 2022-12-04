@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "songdkl"
-version = "0.3.0"
+version = "0.3.1"
 description = "automated quantitation of vocal learning in songbirds"
 authors = [
     {name = "David Mets"},
