@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Added
+- Add logging and progress bars
+  [#60](https://github.com/NickleDave/songdkl/pull/60).
+  Fixes [#22](https://github.com/NickleDave/songdkl/issues/22).
+- Add functions to prepare data for `songdkl.calculate` 
+  and `numsyls.numsyls` functions, and save and load that data 
+  as numpy arrays. Also add a `prep` command to the cli that 
+  uses these functions 
+  [#62](https://github.com/NickleDave/songdkl/pull/62).
+  Fixes [#47](https://github.com/NickleDave/songdkl/issues/47),
+  [#25](https://github.com/NickleDave/songdkl/issues/25),
+  and [#19](https://github.com/NickleDave/songdkl/issues/19).
+- Add use of `dask` to parallelize data prep
+  [#63](https://github.com/NickleDave/songdkl/pull/63).
+  Fixes [#18](https://github.com/NickleDave/songdkl/issues/18).
+
 ## [0.2.0]
 ### Added
 - Add scripts to download Dryad dataset
@@ -25,9 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Otsu's method, as implemented in scikit-image
   [#58](https://github.com/NickleDave/songdkl/pull/58).
   Fixes [#37](https://github.com/NickleDave/songdkl/issues/37).
-- Add logging and progress bars
-  [#60](https://github.com/NickleDave/songdkl/pull/60).
-  Fixes [#22](https://github.com/NickleDave/songdkl/issues/22).
 
 ## [0.2.0b1]
 ### Added
@@ -35,17 +49,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and provided by [David Mets](https://github.com/dgmets) for testing
   [#43](https://github.com/NickleDave/songdkl/pull/43).
   Fixes [#40](https://github.com/NickleDave/songdkl/issues/40).
-- Add functions to prepare data for `songdkl.calculate` 
-  and `numsyls.numsyls` functions, and save and load that data 
-  as numpy arrays. Also add a `prep` command to the cli that 
-  uses these functions 
-  [#62](https://github.com/NickleDave/songdkl/pull/62).
-  Fixes [#47](https://github.com/NickleDave/songdkl/issues/47),
-  [#25](https://github.com/NickleDave/songdkl/issues/25),
-  and [#19](https://github.com/NickleDave/songdkl/issues/19).
-- Add use of `dask` to parallelize data prep
-  [#63](https://github.com/NickleDave/songdkl/pull/63).
-  Fixes [#18](https://github.com/NickleDave/songdkl/issues/18).
 
 ### Changed
 - Refactor/revise codebase for readability
