@@ -72,7 +72,7 @@ def apply_threshold(audio_arr: np.ndarray, thresh: int | float | None = None) ->
     return np.where(abs(audio_arr) > thresh, audio_arr, np.zeros(audio_arr.shape))
 
 
-def segment_audio(audio_arr: np.ndarray) -> list[tuple[slice]]:
+def segment_audio(audio_arr: np.ndarray) -> list[slice]:
     """Segment audio into clips containing syllables,
     using ``scipy.ndimage.find_objects``.
     Expects ``audio_arr`` to have zero elements, e.g.,
@@ -91,14 +91,17 @@ def segment_audio(audio_arr: np.ndarray) -> list[tuple[slice]]:
 
     Returns
     -------
-    objs : list
-        Of tuples of slices;
-        the segments identified by
+    slices : list
+        Of slices; the segments identified by
         ``scipy.ndimage.find_objects``.
     """
     label, _ = ndimage.label(audio_arr)  # label objects in the threshold
     objs = ndimage.find_objects(label)  # recover object positions
-    return objs
+    # find_objects returns a list of tuples with eacht uple containing N slices,
+    # N being the dimension of the input array.
+    # We assume audio is one dimensional so we just take the slices from the length-1 tuples
+    slices = [slice_tup[0] for slice_tup in objs]
+    return slices
 
 
 def get_syllable_clips_from_audio(audio_arr: np.ndarray,
@@ -138,7 +141,7 @@ def get_syllable_clips_from_audio(audio_arr: np.ndarray,
     syllable_clips : list
         Of ``numpy.ndarray``.
     slices : list
-        Of tuples of slices.
+        Of slices.
     threshold_val : float or int
         Threshold value obtained
         using the method specified by
