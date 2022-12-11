@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Added
+- Have `prep_and_save` also save the segmentation of .wav files,
+  so that it can be more easily inspected
+  [#71](https://github.com/NickleDave/songdkl/pull/71). 
+  Segmentation is saved as annotated sequences with
+  onsets, offsets, and dummy labels in .csv files
+  Fixes [#68](https://github.com/NickleDave/songdkl/issues/68).
+- Add ability to specify hyperparameters and other arguments 
+  to the Gaussian mixture model, by adding `gmm_kwargs` parameter 
+  to the `numsyls.numsyls` and `songdkl.calculate` functions, 
+  and by adding corresponding arguments to the command-line interface
+  [#72](https://github.com/NickleDave/songdkl/pull/72).
+  Fixes [#69](https://github.com/NickleDave/songdkl/issues/70).
+
+### Fixed
+- Fix cross-validation done by `numsyls` function, 
+  so that we measure BIC on each held out split after training 
+  on the remaining splits 
+  [#72](https://github.com/NickleDave/songdkl/pull/72).
+  Fixes [#69](https://github.com/NickleDave/songdkl/issues/69).
+  Before this we fit then measured BIC on each split separately, 
+  which is not technically wrong
+  but likely increased variance of the measure instead of 
+  decreasing it.
+
 ## [0.3.1]
 ### Fixed
 - Fix `songdkl prep` command option `--output-dir-path` 
@@ -30,12 +56,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and clean up other parameters so they all use dashes
   [#66](https://github.com/NickleDave/songdkl/pull/63).
   Fixes [#27](https://github.com/NickleDave/songdkl/issues/27).
-- Have `prep_and_save` also save the segmentation of .wav files,
-  so that it can be more easily inspected
-  [#71](https://github.com/NickleDave/songdkl/pull/71). 
-  Segmentation is saved as annotated sequences with
-  onsets, offsets, and dummy labels in .csv files
-  Fixes [#68](https://github.com/NickleDave/songdkl/issues/68).
 
 ### Changed
 - Combine `numsyls` and `em_of_gmm_cluster` into a single function,
