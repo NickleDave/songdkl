@@ -93,4 +93,21 @@ def get():
                                          "a good rule of thumb is to use 3 splits.")
                                    )
 
+    for subparser in (calculate_subparser, numsyls_subparser):
+        # add args for GaussianMixture that both subparsers use
+        subparser.add_argument('--max-iter', type=int, default=100000,
+                               help=('The number of EM iterations to perform when fitting GaussianMixture. '
+                                     'Default is 100000.'))
+        subparser.add_argument('--n-init', type=int, default=5,
+                               help=("The number of initializations to perform when fitting GaussianMixture. "
+                                     "The best results are kept. Default is 5."))
+        subparser.add_argument('--covariance-type', type=str, default='full',
+                               choices={'full', 'tied', 'diag', 'spherical'},
+                               help=("String describing the type of covariance parameters to use"
+                                     "when fitting GaussianMixture. Default is 'full'."))
+        subparser.add_argument('--random-state', type=int, default=42,
+                               help="Int seed to random number generator. Default is 42.")
+        subparser.add_argument('--reg-covar', type=float, default=1e-6,
+                               help=("Non-negative regularization added to the diagonal of covariance "
+                                     "when fitting GaussianMixture. Default is 1e-6."))
     return parser
