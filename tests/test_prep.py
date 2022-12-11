@@ -25,10 +25,17 @@ SONG_DATA_SUBDIRS_SMALL = [
 @pytest.mark.parametrize('max_num_psds', [None, 10, 100])
 def test_prep(dir_path, max_wavs, max_num_psds, kwargify):
     kwargs = kwargify(dir_path=dir_path, max_wavs=max_wavs, max_num_psds=max_num_psds)
-    data = songdkl.prep.prep(**kwargs)
-    assert isinstance(data, np.ndarray)
+    out = songdkl.prep.prep(**kwargs)
+    assert len(out) == 2
+    syls_from_wavs, segedpsds = out
+    assert isinstance(syls_from_wavs, list)
+    assert all([isinstance(syls_from_wav, songdkl.syllables.SyllablesFromWav)
+                for syls_from_wav in syls_from_wavs])
+    if max_wavs:
+        assert len(syls_from_wavs) <= max_wavs
+    assert isinstance(segedpsds, np.ndarray)
     if max_num_psds:
-        assert data.shape[0] <= max_num_psds
+        assert segedpsds.shape[0] <= max_num_psds
 
 
 @pytest.mark.smoke
