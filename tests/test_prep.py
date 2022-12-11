@@ -61,7 +61,7 @@ def test_prep(dir_path, max_wavs, max_num_psds, kwargify):
 )
 def test_prep_and_save(dir_path, output_dir_path, max_wavs, max_num_psds, tmp_path, kwargify):
     if isinstance(dir_path, pathlib.Path):
-        dir_path = shutil.copytree(dir_path, tmp_path, dirs_exist_ok=True)
+        dir_path = shutil.copytree(dir_path, tmp_path / dir_path.name, dirs_exist_ok=True)
     elif isinstance(dir_path, list):
         dir_path = [
             shutil.copytree(dir_path_, tmp_path / dir_path_.name, dirs_exist_ok=True) for dir_path_ in dir_path

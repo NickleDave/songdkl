@@ -65,10 +65,16 @@ def generated_song_data_root():
     return GENERATED_SONG_DATA_ROOT
 
 
-SONG_DATA_ZARR_PATHS = [
-    GENERATED_SONG_DATA_ROOT / dir_.name / f'{dir_.name}.songdkl.zarr'
-    for dir_ in SONG_DATA_SUBDIRS
+GENERATED_SONG_DATA_SUBDIRS = [
+    dir_ for dir_ in GENERATED_SONG_DATA_ROOT.iterdir()
+    if dir_.is_dir()
 ]
+
+
+SONG_DATA_ZARR_PATHS = []
+for generated_song_data_subdir in GENERATED_SONG_DATA_SUBDIRS:
+    zarr_path = sorted(generated_song_data_subdir.glob('*.songdkl.zarr'))
+    SONG_DATA_ZARR_PATHS.append(zarr_path[0])
 
 
 @pytest.fixture
