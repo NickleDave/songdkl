@@ -30,6 +30,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and clean up other parameters so they all use dashes
   [#66](https://github.com/NickleDave/songdkl/pull/63).
   Fixes [#27](https://github.com/NickleDave/songdkl/issues/27).
+- Have `prep_and_save` also save the segmentation of .wav files,
+  so that it can be more easily inspected
+  [#71](https://github.com/NickleDave/songdkl/pull/71). 
+  Segmentation is saved as annotated sequences with
+  onsets, offsets, and dummy labels in .csv files
+  Fixes [#68](https://github.com/NickleDave/songdkl/issues/68).
 
 ### Changed
 - Combine `numsyls` and `em_of_gmm_cluster` into a single function,
