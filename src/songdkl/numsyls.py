@@ -1,5 +1,6 @@
 """functions to estimate the number of syllables in a bird's song"""
 from __future__ import annotations
+import dataclasses
 import logging
 import pathlib
 
@@ -8,6 +9,7 @@ import rich.progress
 from sklearn.mixture import GaussianMixture
 import scipy.spatial
 
+from .constants import DefaultGaussianMixtureKwargs, DEFAULT_GMM_KWARGS
 from .load import load_or_prep
 
 
@@ -20,6 +22,7 @@ def numsyls(psds_ref: np.ndarray,
             min_components: int = 2,
             max_components: int = 22,
             n_splits: int = 1,
+            gmm_kwargs: DEFAULT_GMM_KWARGS | dict = DEFAULT_GMM_KWARGS,
             ) -> int:
     """Determine number of syllable classes in a bird's song.
 
@@ -53,6 +56,16 @@ def numsyls(psds_ref: np.ndarray,
         If sufficient data are available,
         a good rule of thumb is to use 3 splits.
         See Notes below for more detail.
+    gmm_kwargs : dict, DefaultGaussianMixtureKwargs
+        Optional dict with keyword argument to pass into
+        ``sklearn.GaussianMixtureModel`` when instantiating.
+        If not supplied, the defaults are used,
+        that are represented by a dataclass,
+        ``songdkl.constants.DefaultGaussianMixtureKwargs``.
+        Note that specifying ``n_components``
+        as one of the ``gmm_kwargs`` will raise an
+        error since this function searches for the best
+        value for ``n_components``.
 
     Returns
     -------
@@ -70,6 +83,21 @@ def numsyls(psds_ref: np.ndarray,
     human assessment or BIC values
     computed without splits.
     """
+    if isinstance(gmm_kwargs, DefaultGaussianMixtureKwargs):
+        gmm_kwargs = dataclasses.asdict(gmm_kwargs)
+    elif isinstance(gmm_kwargs, dict):
+        pass
+    else:
+        raise TypeError(
+            '`gmm_kwargs` must be a dict or DefaultGaussianMixtureKwargs,'
+            f'but was type: {type(gmm_kwargs)}'
+        )
+    if 'n_components' in gmm_kwargs:
+        raise ValueError(
+            "`gmm_kwargs` has key `n_components` but that argument to GaussianMixture "
+            "are the `k_ref` and `k_compare` arguments to this function."
+        )
+
     logger.log(
         msg=(f'Identifying best number of components to describe the data, psds_ref (shape: {psds_ref.shape}), '
              f'with parameters n_basis={n_basis}, basis={basis}, '
@@ -98,13 +126,15 @@ def numsyls(psds_ref: np.ndarray,
         if n_splits > 1:
             split_bics = []
             splits = np.array_split(s, n_splits)
-            for split in splits:
-                gmm = GaussianMixture(n_components=n_components, max_iter=100000, n_init=5, covariance_type='full')
-                gmm.fit(split)
-                split_bics.append(gmm.bic(split))
+            for split_ind in range(len(splits)):
+                train_split = np.concatenate([split for ind, split in enumerate(splits) if ind != split_ind])
+                val_split = splits[split_ind]
+                gmm = GaussianMixture(n_components=n_components, **gmm_kwargs)
+                gmm.fit(train_split)
+                split_bics.append(gmm.bic(val_split))
             bics.append(np.mean(split_bics))
         else:
-            gmm = GaussianMixture(n_components=n_components, max_iter=100000, n_init=5, covariance_type='full')
+            gmm = GaussianMixture(n_components=n_components, **gmm_kwargs)
             gmm.fit(np.array(s))
             bics.append(gmm.bic(np.array(s)))
     lowest_bic_ind = np.argmin(bics)
@@ -120,6 +150,7 @@ def numsyls_from_path(ref_path: str | pathlib.Path,
                       min_components: int = 2,
                       max_components: int = 22,
                       n_splits: int = 1,
+                      gmm_kwargs: DEFAULT_GMM_KWARGS | dict = DEFAULT_GMM_KWARGS,
                       ) -> int:
     """Determine number of syllable classes in a bird's song,
     by fitting Gaussian Mixture Models to PSDs of segmented
@@ -156,6 +187,16 @@ def numsyls_from_path(ref_path: str | pathlib.Path,
         If sufficient data are available,
         a good rule of thumb is to use 3 splits.
         See Notes below for more detail.
+    gmm_kwargs : dict, DefaultGaussianMixtureKwargs
+        Optional dict with keyword argument to pass into
+        ``sklearn.GaussianMixtureModel`` when instantiating.
+        If not supplied, the defaults are used,
+        that are represented by a dataclass,
+        ``songdkl.constants.DefaultGaussianMixtureKwargs``.
+        Note that specifying ``n_components``
+        as one of the ``gmm_kwargs`` will raise an
+        error since this function searches for the best
+        value for ``n_components``.
 
     Returns
     -------
@@ -171,5 +212,5 @@ def numsyls_from_path(ref_path: str | pathlib.Path,
     )
     psds_ref = load_or_prep(ref_path, max_wavs, max_num_psds)
 
-    sylno_bic = numsyls(psds_ref, n_basis, basis, min_components, max_components, n_splits)
+    sylno_bic = numsyls(psds_ref, n_basis, basis, min_components, max_components, n_splits, gmm_kwargs)
     return sylno_bic

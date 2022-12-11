@@ -1,8 +1,10 @@
 """run when songdkl is called from the command-line, e.g. '$ songdkl --help'"""
 from __future__ import annotations
+import dataclasses
 import logging
 
 from . import argparser
+from .constants import DefaultGaussianMixtureKwargs
 from .numsyls import numsyls_from_path
 from .prep import prep_and_save
 from .songdkl import calculate_from_path
@@ -35,7 +37,12 @@ def main(argv=None):
         prep_and_save(dir_path=args.dir_path, output_dir_path=output_dir_path,
                       max_wavs=args.max_wavs, max_num_psds=args.max_num_psds)
 
-    elif args.command == 'calculate':
+    if args.command in ('calculate', 'numsyls'):
+        gmm_kwargs = dataclasses.asdict(DefaultGaussianMixtureKwargs())
+        for arg in ('max_iter', 'n_init', 'covariance_type', 'random_state', 'reg_covar'):
+            gmm_kwargs.update({arg: getattr(args, arg)})
+
+    if args.command == 'calculate':
         score1, score2, n_psds_ref, n_psds_compare = calculate_from_path(ref_path=args.ref_path,
                                                                          compare_path=args.compare_path,
                                                                          k_ref=args.k_ref,
@@ -43,7 +50,8 @@ def main(argv=None):
                                                                          max_wavs=args.max_wavs,
                                                                          max_num_psds=args.max_num_psds,
                                                                          n_basis=args.n_basis,
-                                                                         basis=args.basis)
+                                                                         basis=args.basis,
+                                                                         gmm_kwargs=gmm_kwargs)
         print(
             f'{args.ref_path}\t{args.compare_path}\t'
             f'{args.k_ref}\t{args.k_compare}\t'
@@ -60,6 +68,7 @@ def main(argv=None):
                                    min_components=args.min_components,
                                    max_components=args.max_components,
                                    n_splits=args.n_splits,
+                                   gmm_kwargs=gmm_kwargs,
                                    )
         print(
             f'{args.ref_path}\t{n_syls}'

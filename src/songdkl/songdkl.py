@@ -1,5 +1,6 @@
 """functions to compute song divergence"""
 from __future__ import annotations
+import dataclasses
 import logging
 import pathlib
 from typing import Any, Tuple, Union
@@ -8,6 +9,7 @@ import scipy.spatial as spatial
 import numpy as np
 from sklearn.mixture import GaussianMixture
 
+from .constants import DefaultGaussianMixtureKwargs, DEFAULT_GMM_KWARGS
 from .load import load_or_prep
 
 
@@ -19,7 +21,9 @@ def calculate(psds_ref: np.ndarray,
               k_ref: int,
               k_compare: int,
               n_basis: int = 50,
-              basis: str = 'first') -> Tuple[Union[float, Any], Union[float, Any], int, int]:
+              basis: str = 'first',
+              gmm_kwargs: DEFAULT_GMM_KWARGS | dict = DEFAULT_GMM_KWARGS
+              ) -> Tuple[Union[float, Any], Union[float, Any], int, int]:
     """Calculate :math:`\text{Song }D_{KL}` metric.
 
     Parameters
@@ -40,6 +44,16 @@ def calculate(psds_ref: np.ndarray,
         If 'first', use the first `n_basis` syllables.
         If `random`, grab a random set of size `n_basis`.
         Default is 'first'.
+    gmm_kwargs : dict, DefaultGaussianMixtureKwargs
+        Optional dict with keyword argument to pass into
+        ``sklearn.GaussianMixtureModel`` when instantiating.
+        If not supplied, the defaults are used,
+        that are represented by a dataclass,
+        ``songdkl.constants.DefaultGaussianMixtureKwargs``.
+        Note that specifying ``n_components``
+        as one of the ``gmm_kwargs`` will raise an
+        error since those are specified as the ``k_ref``
+        and ``k_compare`` arguments to this function.
 
     Returns
     -------
@@ -57,6 +71,21 @@ def calculate(psds_ref: np.ndarray,
     n_psd_compare : int
         Number of PDSs used from comparison data set.
     """
+    if isinstance(gmm_kwargs, DefaultGaussianMixtureKwargs):
+        gmm_kwargs = dataclasses.asdict(gmm_kwargs)
+    elif isinstance(gmm_kwargs, dict):
+        pass
+    else:
+        raise TypeError(
+            '`gmm_kwargs` must be a dict or DefaultGaussianMixtureKwargs,'
+            f'but was type: {type(gmm_kwargs)}'
+        )
+    if 'n_components' in gmm_kwargs:
+        raise ValueError(
+            "`gmm_kwargs` has key `n_components` but that argument to GaussianMixture "
+            "are the `k_ref` and `k_compare` arguments to this function."
+        )
+
     logger.log(
         msg=(f'Calculating songdkl with psds_ref (shape: {psds_ref.shape}) '
              f'and psds_compare (shape: {psds_compare.shape}.), '
@@ -106,10 +135,10 @@ def calculate(psds_ref: np.ndarray,
         msg=f'Fitting Gaussian Mixture Models',
     )
     # estimate GMMs
-    P = GaussianMixture(n_components=k_ref, max_iter=100000, n_init=5, covariance_type='full')
+    P = GaussianMixture(n_components=k_ref, **gmm_kwargs)
     P.fit(s_ref)
 
-    Q = GaussianMixture(n_components=k_compare, max_iter=100000, n_init=5, covariance_type='full')
+    Q = GaussianMixture(n_components=k_compare, **gmm_kwargs)
     Q.fit(s_compare)
 
     logger.log(
@@ -147,7 +176,9 @@ def calculate_from_path(ref_path: str | pathlib.Path,
                         max_wavs: int = 120,
                         max_num_psds: int = 10000,
                         n_basis: int = 50,
-                        basis: str = 'first') -> Tuple[Union[float, Any], Union[float, Any], int, int]:
+                        basis: str = 'first',
+                        gmm_kwargs: DEFAULT_GMM_KWARGS | dict = DEFAULT_GMM_KWARGS
+                        ) -> Tuple[Union[float, Any], Union[float, Any], int, int]:
     """Calculate :math:`\text{Song }D_{KL}` metric.
 
     Parameters
@@ -177,6 +208,16 @@ def calculate_from_path(ref_path: str | pathlib.Path,
         If 'first', use the first `n_basis` syllables.
         If `random`, grab a random set of size `n_basis`.
         Default is 'first'.
+    gmm_kwargs : dict, DefaultGaussianMixtureKwargs
+        Optional dict with keyword argument to pass into
+        ``sklearn.GaussianMixtureModel`` when instantiating.
+        If not supplied, the defaults are used,
+        that are represented by a dataclass,
+        ``songdkl.constants.DefaultGaussianMixtureKwargs``.
+        Note that specifying ``n_components``
+        as one of the ``gmm_kwargs`` will raise an
+        error since those are specified as the ``k_ref``
+        and ``k_compare`` arguments to this function.
 
     Returns
     -------
@@ -211,4 +252,5 @@ def calculate_from_path(ref_path: str | pathlib.Path,
                      k_ref,
                      k_compare,
                      n_basis,
-                     basis)
+                     basis,
+                     gmm_kwargs)
