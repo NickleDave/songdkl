@@ -43,16 +43,10 @@ WINDOW_FOR_FINDOBJ = 2
 def test_segment_audio(samp_freq_and_wav_data):
     samp_freq, data = samp_freq_and_wav_data
     smoothrect = songdkl.audio.smoothrect(data, WINDOW_FOR_FINDOBJ, samp_freq)
-    objs = songdkl.audio.segment_audio(smoothrect)
-    assert isinstance(objs, list)
+    slices = songdkl.audio.segment_audio(smoothrect)
+    assert isinstance(slices, list)
     assert all(
-        [isinstance(obj, tuple) for obj in objs]
-    )
-    assert all(
-        [len(obj) == 1 for obj in objs]
-    )
-    assert all(
-        [isinstance(obj[0], slice) for obj in objs]
+        [isinstance(slice_, slice) for slice_ in slices]
     )
 
 
@@ -69,13 +63,7 @@ def test_get_syllable_clips_from_audio(samp_freq_and_wav_data):
 
     assert isinstance(slices, list)
     assert all(
-        [isinstance(slice_, tuple) for slice_ in slices]
-    )
-    assert all(
-        [len(slice_) == 1 for slice_ in slices]
-    )
-    assert all(
-        [isinstance(slice_[0], slice) for slice_ in slices]
+        [isinstance(slice_, slice) for slice_ in slices]
     )
 
     assert isinstance(threshold_value, float)
@@ -108,9 +96,8 @@ def test_get_syllable_clips_from_audio_threshold_iou(threshold_method,
                                                                rate,
                                                                threshold=threshold_method)
     label_vec = np.zeros_like(audio_arr)
-    for slice_tup in slices:
-        slice = slice_tup[0]
-        label_vec[slice.start:slice.stop] = 1.0
+    for slice_ in slices:
+        label_vec[slice_.start:slice_.stop] = 1.0
     reference_df = bird_slice_df[bird_slice_df.filename == wav_path.name]
     reference_start, reference_stop = reference_df.start.values, reference_df.stop.values
     reference_label_vec = np.zeros_like(audio_arr)

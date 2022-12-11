@@ -48,7 +48,8 @@ def load_or_prep(data_path: str | pathlib.Path,
             )
         segedpsds = load(zarr_path=data_path)
     elif data_path.is_dir():
-        segedpsds = prep(data_path, max_wavs, max_num_psds)
+        # we don't return syls_from_wavs
+        _, segedpsds = prep(data_path, max_wavs, max_num_psds)
     else:
         raise ValueError(
             f'Not recognized as a .zarr file or a directory: {data_path}'

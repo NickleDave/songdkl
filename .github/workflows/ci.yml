@@ -23,6 +23,9 @@ jobs:
         run: |
           nox -s test-data-download-source
           nox -s test-data-download-generated
+      - name: install libsndfile1 on ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt install libsndfile1
       - name: run tests
         run: |
           pip install nox

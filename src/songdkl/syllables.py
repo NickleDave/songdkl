@@ -47,11 +47,23 @@ class SyllablesFromWav:
     syls : list
         Of ``numpy.ndarray``, syllables
         returned by ``songdkl.audio.getsyls``
+    slices: list
+        Of ``slice`` objects,
+        returned by ``audio.get_syllable_clips_from_audio``
+    threshold: float
+        Threshold value returned by
+        ``audio.get_syllable_clips_from_audio``.
+    wav_path : str, pathlib.Path
+        Path to .wav file that syllables were generated from.
     rate : int
         Sampling rate of .wav file.
     """
     syls: list[np.ndarray]
+    slices: list[slice]
+    threshold: float
+    wav_path: str | pathlib.Path
     rate: int
+
 
 
 def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFromWav]:
@@ -76,11 +88,11 @@ def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFro
     """
     bag = dask.bag.from_sequence(wav_paths)
 
-    # for wav_path in rich.progress.track(wav_paths, description='Getting syllables from .wav files'):
     def _syllabify(wav_path):
         rate, data = audio.load_wav(wav_path)
         syls_this_wav, slices_this_wav, threshold_value = audio.get_syllable_clips_from_audio(data, rate)
-        return SyllablesFromWav(syls=syls_this_wav, rate=rate)
+        return SyllablesFromWav(syls=syls_this_wav, slices=slices_this_wav, threshold=threshold_value,
+                                wav_path=wav_path, rate=rate)
 
     with dask.diagnostics.progress.ProgressBar():
         syls_from_wavs = bag.map(_syllabify).compute()

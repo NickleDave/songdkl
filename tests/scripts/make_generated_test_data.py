@@ -36,28 +36,32 @@ def prep_and_save():
                                    output_dir_path=output_dir_path)
 
 
-# --- main script ----
-print(
-    "Generating data for tests."
-)
+def main():
+    # --- main script ----
+    print(
+        "Generating data for tests."
+    )
 
-print(
-    "Preparing and saving arrays of PSDs from syllable segments."
-)
-prep_and_save()
+    print(
+        "Preparing and saving arrays of PSDs from syllable segments."
+    )
+    prep_and_save()
 
-print(
-    f'making archive from {GENERATED_SONG_DATA_ROOT}'
-)
-shutil.make_archive(
-    './tests/data-for-tests/generated/generated-test-data',
-    'gztar',
-    root_dir=GENERATED_DATA_ROOT,
-    # specify `base_dir` since we only want to archive song_data
-    base_dir="song_data",  # needs to be written relative to root
-)
+    print(
+        f'making archive from {GENERATED_SONG_DATA_ROOT}'
+    )
+    shutil.make_archive(
+        './tests/data-for-tests/generated/generated-test-data',
+        'gztar',
+        root_dir=GENERATED_DATA_ROOT,
+        # specify `base_dir` since we only want to archive song_data
+        base_dir="song_data",  # needs to be written relative to root
+    )
+
+    print(
+        "Done preparing generated data for tests."
+    )
 
 
-print(
-    "Done preparing generated data for tests."
-)
+if __name__ == '__main__':
+    main()

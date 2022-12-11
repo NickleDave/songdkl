@@ -3,10 +3,12 @@ import copy
 import logging
 import pathlib
 
+import crowsetta
 import numpy as np
+import rich.progress
 import zarr
 
-from .syllables import get_all_syls, convert_syl_to_psd
+from .syllables import get_all_syls, convert_syl_to_psd, SyllablesFromWav
 
 
 logger = logging.getLogger(__name__)
@@ -14,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def prep(dir_path: str | pathlib.Path,
          max_wavs: int = 120,
-         max_num_psds: int = 10000) -> np.ndarray:
+         max_num_psds: int = 10000) -> tuple[list[SyllablesFromWav], np.ndarray]:
     """Prepare dataset for use with either
     ``songdkl.numsyls`` or ``songdkl.calculate``.
 
@@ -51,7 +53,7 @@ def prep(dir_path: str | pathlib.Path,
         level=logging.INFO
     )
     segedpsds = convert_syl_to_psd(syls_from_wavs, max_num_psds)
-    return np.array(segedpsds)
+    return syls_from_wavs, np.array(segedpsds)
 
 
 def prep_and_save(dir_path: str | pathlib.Path | list[str | pathlib.Path],
@@ -103,7 +105,38 @@ def prep_and_save(dir_path: str | pathlib.Path | list[str | pathlib.Path],
             msg=f'Preparing dataset from dir_path: {a_dir_path}',
             level=logging.INFO
         )
-        segedpsds = prep(a_dir_path, max_wavs, max_num_psds)
+        syls_from_wavs, segedpsds = prep(a_dir_path, max_wavs, max_num_psds)
+        logger.log(
+            msg=f'Saving syllable segmentation in annotation files: {an_output_dir_path}',
+            level=logging.INFO
+        )
+        annots = []
+        for syls in rich.progress.track(syls_from_wavs, 'Saving segmentation'):
+            segments = []
+            for slice_ in syls.slices:
+                segment = crowsetta.Segment.from_keyword(
+                    label='-',  # dummy label
+                    onset_sample=slice_.start,
+                    offset_sample=slice_.stop,
+                    onset_s=np.around(slice_.start / syls.threshold, decimals=3),  # 3 because milliseconds
+                    offset_s=np.around(slice_.stop / syls.threshold, decimals=3),
+                )
+                segments.append(segment)
+            seq = crowsetta.Sequence.from_segments(segments)
+            # save segments from each file in simple-seq format
+            annot_path = an_output_dir_path / f'{pathlib.Path(syls.wav_path).name}-threshold-{syls.threshold}'
+            simpleseq = crowsetta.formats.seq.SimpleSeq(labels=seq.labels, onsets_s=seq.onsets_s,
+                                                        offsets_s=seq.offsets_s, annot_path=annot_path)
+            simpleseq.to_file(annot_path=annot_path)
+            annot = crowsetta.Annotation(seq=seq, annot_path=annot_path, notated_path=syls.wav_path)
+            annots.append(annot)
+
+        # save segments from all files in generic-seq format
+        generic_seq = crowsetta.formats.seq.GenericSeq(annots=annots)
+        generic_seq.to_file(
+            annot_path=an_output_dir_path / f'{a_dir_path.name}.annot.csv'
+        )
+
         logger.log(
             msg=f'Saving array to: {an_output_dir_path}',
             level=logging.INFO
