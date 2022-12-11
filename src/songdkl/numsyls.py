@@ -98,10 +98,12 @@ def numsyls(psds_ref: np.ndarray,
         if n_splits > 1:
             split_bics = []
             splits = np.array_split(s, n_splits)
-            for split in splits:
+            for split_ind in range(len(splits)):
+                train_split = np.concatenate([split for ind, split in enumerate(splits) if ind != split_ind])
+                val_split = splits[split_ind]
                 gmm = GaussianMixture(n_components=n_components, max_iter=100000, n_init=5, covariance_type='full')
-                gmm.fit(split)
-                split_bics.append(gmm.bic(split))
+                gmm.fit(train_split)
+                split_bics.append(gmm.bic(val_split))
             bics.append(np.mean(split_bics))
         else:
             gmm = GaussianMixture(n_components=n_components, max_iter=100000, n_init=5, covariance_type='full')
