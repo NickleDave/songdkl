@@ -174,7 +174,7 @@ def calculate_from_path(ref_path: str | pathlib.Path,
                         k_ref: int,
                         k_compare: int,
                         max_wavs: int = 120,
-                        max_num_psds: int = 10000,
+                        max_syllables: int = 10000,
                         n_basis: int = 50,
                         basis: str = 'first',
                         gmm_kwargs: DEFAULT_GMM_KWARGS | dict = DEFAULT_GMM_KWARGS
@@ -197,9 +197,9 @@ def calculate_from_path(ref_path: str | pathlib.Path,
         Number of syllable classes in song of bird compared with reference.
     max_wavs : int
         Maximum number of wav files to use. Default is 120.
-    max_num_psds : int
-        Maximum number of power spectral densities (PSDs) to calculate.
-        Default is 10000.
+    max_syllables : int
+        Maximum number of segmented syllables to use when generating
+        power spectral densities (PSDs). Default is 10000.
     n_basis : int
         Number of syllables to use as basis set. Default is 50.
     basis : str
@@ -240,13 +240,13 @@ def calculate_from_path(ref_path: str | pathlib.Path,
         level=logging.INFO
     )
 
-    segedpsds_ref = load_or_prep(ref_path, max_wavs, max_num_psds)
+    segedpsds_ref = load_or_prep(ref_path, max_wavs, max_syllables)
 
     logger.log(
         msg=f'Getting PSDs from compare_path: {compare_path}',
         level=logging.INFO
     )
-    segedpsds_compare = load_or_prep(compare_path, max_wavs, max_num_psds)
+    segedpsds_compare = load_or_prep(compare_path, max_wavs, max_syllables)
     return calculate(segedpsds_ref,
                      segedpsds_compare,
                      k_ref,

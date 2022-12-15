@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def prep(dir_path: str | pathlib.Path,
          max_wavs: int = 120,
-         max_num_psds: int = 10000) -> tuple[list[SyllablesFromWav], np.ndarray]:
+         max_syllables: int = 10000) -> tuple[list[SyllablesFromWav], np.ndarray]:
     """Prepare dataset for use with either
     ``songdkl.numsyls`` or ``songdkl.calculate``.
 
@@ -29,12 +29,13 @@ def prep(dir_path: str | pathlib.Path,
     dir_path : str, pathlib.Path
     max_wavs : int
         Maximum number of .wav files to use. Default is 120.
-    max_num_psds : int
-        Maximum number of PSDs to compute. Default is 10k.
+    max_syllables : int
+        Maximum number of segmented syllables to use when generating
+        power spectral densities (PSDs). Default is 10000.
     """
     logger.log(
         msg=f'Preparing dataset from dir_path: {dir_path}, '
-            f'with max_wavs={max_wavs} and max_num_psds={max_num_psds}.',
+            f'with max_wavs={max_wavs} and max_syllables={max_syllables}.',
         level=logging.INFO
     )
     dir_path = pathlib.Path(dir_path)
@@ -52,14 +53,14 @@ def prep(dir_path: str | pathlib.Path,
         msg=f'Computing PSDs from syllable segments',
         level=logging.INFO
     )
-    segedpsds = convert_syl_to_psd(syls_from_wavs, max_num_psds)
+    segedpsds = convert_syl_to_psd(syls_from_wavs, max_syllables)
     return syls_from_wavs, np.array(segedpsds)
 
 
 def prep_and_save(dir_path: str | pathlib.Path | list[str | pathlib.Path],
                   output_dir_path: str | pathlib.Path | list[str | pathlib.Path] | None = None,
                   max_wavs: int = 120,
-                  max_num_psds: int = 10000) -> None:
+                  max_syllables: int = 10000) -> None:
     """Prepare dataset for use with either
     ``songdkl.numsyls`` or ``songdkl.calculate``.
 
@@ -77,8 +78,9 @@ def prep_and_save(dir_path: str | pathlib.Path | list[str | pathlib.Path],
         If None, defaults to ``dir_path``.
     max_wavs : int
         Maximum number of .wav files to use. Default is 120.
-    max_num_psds : int
-        Maximum number of PSDs to compute. Default is 10k.
+    max_syllables : int
+        Maximum number of segmented syllables to use when generating
+        power spectral densities (PSDs). Default is 10000.
     """
     if isinstance(dir_path, (str, pathlib.Path)):
         dir_path = [dir_path]
@@ -105,7 +107,7 @@ def prep_and_save(dir_path: str | pathlib.Path | list[str | pathlib.Path],
             msg=f'Preparing dataset from dir_path: {a_dir_path}',
             level=logging.INFO
         )
-        syls_from_wavs, segedpsds = prep(a_dir_path, max_wavs, max_num_psds)
+        syls_from_wavs, segedpsds = prep(a_dir_path, max_wavs, max_syllables)
         logger.log(
             msg=f'Saving syllable segmentation in annotation files: {an_output_dir_path}',
             level=logging.INFO

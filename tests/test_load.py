@@ -20,7 +20,7 @@ ZARR_PATH_TO_USE = ZARR_PATH_TO_USE[0]
 
 
 @pytest.mark.parametrize(
-    'data_path, max_wavs, max_num_psds',
+    'data_path, max_wavs, max_syllables',
     [
         # load data
         (ZARR_PATH_TO_USE, None, None),
@@ -32,11 +32,11 @@ ZARR_PATH_TO_USE = ZARR_PATH_TO_USE[0]
         (SUBDIR_TO_USE, 2, 10),
     ]
 )
-def test_load_or_prep(data_path, max_wavs, max_num_psds, kwargify):
-    kwargs = kwargify(data_path=data_path, max_wavs=max_wavs, max_num_psds=max_num_psds)
+def test_load_or_prep(data_path, max_wavs, max_syllables, kwargify):
+    kwargs = kwargify(data_path=data_path, max_wavs=max_wavs, max_syllables=max_syllables)
     out = songdkl.load.load_or_prep(**kwargs)
-    if max_num_psds:
-        assert out.shape[0] <= max_num_psds
+    if max_syllables:
+        assert out.shape[0] <= max_syllables
 
 
 def test_load_zarr(song_data_zarr_factory,

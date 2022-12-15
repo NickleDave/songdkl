@@ -34,7 +34,7 @@ def test_calculate(ref_psds_path, compare_psds_path, k_ref, k_compare):
 
 @pytest.mark.smoke
 @pytest.mark.parametrize(
-    'ref_path, compare_path, k_ref, k_compare, max_wavs, max_num_psds',
+    'ref_path, compare_path, k_ref, k_compare, max_wavs, max_syllables',
     [
         (
             './tests/data-for-tests/source/song_data/bk1bk3-small',
@@ -58,9 +58,9 @@ def test_calculate(ref_psds_path, compare_psds_path, k_ref, k_compare):
         ),
     ]
 )
-def test_calculate_from_path(ref_path, compare_path, k_ref, k_compare, max_wavs, max_num_psds, kwargify):
+def test_calculate_from_path(ref_path, compare_path, k_ref, k_compare, max_wavs, max_syllables, kwargify):
     kwargs = kwargify(ref_path=ref_path, compare_path=compare_path,
-                      k_ref=k_ref, k_compare=k_compare, max_wavs=max_wavs, max_num_psds=max_num_psds)
+                      k_ref=k_ref, k_compare=k_compare, max_wavs=max_wavs, max_syllables=max_syllables)
     out = songdkl.songdkl.calculate_from_path(**kwargs)
     assert len(out) == 4
     score1, score2, n_psds_ref, n_psds_compare = out

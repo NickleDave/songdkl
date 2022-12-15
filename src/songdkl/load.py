@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def load_or_prep(data_path: str | pathlib.Path,
                  max_wavs: int | None = None,
-                 max_num_psds: int | None = None,
+                 max_syllables: int | None = None,
                  ) -> np.ndarray:
     """Either load an array of PSDs from a .zarr file,
     or prepare the PSDs from a directory of .wav files.
@@ -28,8 +28,9 @@ def load_or_prep(data_path: str | pathlib.Path,
     max_wavs : int
         Maximum number of wav files to use.
         Default is None, in which case all are used.
-    max_num_psds : int
-        Maximum number of power spectral densities (PSDs) to calculate.
+    max_syllables : int
+        Maximum number of segmented syllables to use when generating
+        power spectral densities (PSDs).
         Default is None, in which case all are used.
 
     Returns
@@ -39,9 +40,9 @@ def load_or_prep(data_path: str | pathlib.Path,
     """
     data_path = pathlib.Path(data_path)
     if data_path.suffix == '.zarr':
-        if max_wavs is not None or max_num_psds is not None:
+        if max_wavs is not None or max_syllables is not None:
             warnings.warn(
-                f'Values were specified for max_wavs or max_num_psds, '
+                f'Values were specified for max_wavs or max_syllables, '
                 f'but data_path was recognized as a .zarr file. '
                 f'These values are not applied to already prepared datasets. '
                 f'To apply them, run this function on a directory of .wav files.'
@@ -49,7 +50,7 @@ def load_or_prep(data_path: str | pathlib.Path,
         segedpsds = load(zarr_path=data_path)
     elif data_path.is_dir():
         # we don't return syls_from_wavs
-        _, segedpsds = prep(data_path, max_wavs, max_num_psds)
+        _, segedpsds = prep(data_path, max_wavs, max_syllables)
     else:
         raise ValueError(
             f'Not recognized as a .zarr file or a directory: {data_path}'

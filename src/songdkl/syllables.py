@@ -101,7 +101,7 @@ def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFro
 
 
 def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
-                       max_num_psds: int | None = None
+                       max_syllables: int | None = None
                        ) -> list[np.ndarray]:
     """Convert syllable segments to power spectral densities (PSDs).
 
@@ -110,10 +110,11 @@ def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
     syls_from_wavs : list
         Of ``SyllablesFromWav`` instances,
         syllable segments extracted from .wav files.
-    max_num_psds : int
-        Maximum number of PSDs to calculate.
-        Default is None, in which case
-        PSDs will be computed for all syllables.
+    max_syllables : int
+        Maximum number of segmented syllables to use when generating
+        power spectral densities (PSDs).
+        Default is None, in which case PSDs will be computed
+        for all syllables.
 
     Returns
     -------
@@ -142,7 +143,7 @@ def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
         for psd_list in segedpsds
         for psd in psd_list
     ]
-    if max_num_psds:
-        # since we are likely over `max_num_psds` even after `break` above
-        segedpsds = segedpsds[:max_num_psds]
+    if max_segments:
+        # since we are likely over `max_segments` even after `break` above
+        segedpsds = segedpsds[:max_segments]
     return segedpsds

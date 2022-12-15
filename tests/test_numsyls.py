@@ -29,7 +29,7 @@ def test_numsyls():
 
 @pytest.mark.smoke
 @pytest.mark.parametrize(
-    'ref_path, max_wavs, max_num_psds',
+    'ref_path, max_wavs, max_syllables',
     [
         # load data
         (ZARR_PATH_TO_USE, None, None),
@@ -41,7 +41,7 @@ def test_numsyls():
         (SUBDIR_TO_USE, 2, 25),  # need to use > max num components (default 22)
     ]
 )
-def test_numsyls_from_path(ref_path, max_wavs, max_num_psds, kwargify):
-    kwargs = kwargify(ref_path=ref_path, max_wavs=max_wavs, max_num_psds=max_num_psds)
+def test_numsyls_from_path(ref_path, max_wavs, max_syllables, kwargify):
+    kwargs = kwargify(ref_path=ref_path, max_wavs=max_wavs, max_syllables=max_syllables)
     out = songdkl.numsyls.numsyls_from_path(**kwargs)
     assert isinstance(out, int)

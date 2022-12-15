@@ -35,7 +35,7 @@ def main(argv=None):
         else:
             output_dir_path = None
         prep_and_save(dir_path=args.dir_path, output_dir_path=output_dir_path,
-                      max_wavs=args.max_wavs, max_num_psds=args.max_num_psds)
+                      max_wavs=args.max_wavs, max_syllables=args.max_syllables)
 
     if args.command in ('calculate', 'numsyls'):
         gmm_kwargs = dataclasses.asdict(DefaultGaussianMixtureKwargs())
@@ -48,7 +48,7 @@ def main(argv=None):
                                                                          k_ref=args.k_ref,
                                                                          k_compare=args.k_compare,
                                                                          max_wavs=args.max_wavs,
-                                                                         max_num_psds=args.max_num_psds,
+                                                                         max_syllables=args.max_syllables,
                                                                          n_basis=args.n_basis,
                                                                          basis=args.basis,
                                                                          gmm_kwargs=gmm_kwargs)
@@ -62,7 +62,7 @@ def main(argv=None):
     elif args.command == 'numsyls':
         n_syls = numsyls_from_path(ref_path=args.ref_path,
                                    max_wavs=args.max_wavs,
-                                   max_num_psds=args.max_num_psds,
+                                   max_syllables=args.max_syllables,
                                    n_basis=args.n_basis,
                                    basis=args.basis,
                                    min_components=args.min_components,
