@@ -122,28 +122,27 @@ def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
         Of ``numpy.ndarray``,
         PSDs from segmented syllables.
     """
-    bag = dask.bag.from_sequence(syls_from_wavs)
-
-    def _to_psd(syls_from_wav):
+    syl_fs_tups = []
+    # Make a flattened list of tuples (syllable, sampling frequency).
+    # We no longer care what song they came from, just need <= max_segments
+    for syls_from_wav in syls_from_wavs:
         fs = syls_from_wav.rate
+        syl_fs_tups.extend(
+            [(syl, fs) for syl in syls_from_wav.syls]
+        )
+    syl_fs_tups = syl_fs_tups[:max_syllables]  # only compute PSDs for max_segments segments
+    syl_fs_tups_bag = dask.bag.from_sequence(syl_fs_tups)
+
+    def _to_psd(syl_fs_tup):
+        syl, fs = syl_fs_tup
         nfft = int(round(2 ** 14 / 32000.0 * fs))
         segstart = int(round(600 / (fs / float(nfft))))
         segend = int(round(16000 / (fs / float(nfft))))
-        psds = []
-        for syl in syls_from_wav.syls:
-            Pxx, _ = matplotlib.mlab.psd(norm(syl), NFFT=nfft, Fs=fs)
-            psds.append(Pxx)
-        spsds = [norm(psd[segstart:segend]) for psd in psds]
-        return spsds
+        Pxx, _ = matplotlib.mlab.psd(norm(syl), NFFT=nfft, Fs=fs)
+        spsd = norm(Pxx[segstart:segend])
+        return spsd
 
     with dask.diagnostics.progress.ProgressBar():
-        segedpsds = bag.map(_to_psd).compute()
-    segedpsds = [
-        psd
-        for psd_list in segedpsds
-        for psd in psd_list
-    ]
-    if max_segments:
-        # since we are likely over `max_segments` even after `break` above
-        segedpsds = segedpsds[:max_segments]
+        segedpsds = syl_fs_tups_bag.map(_to_psd).compute()
+
     return segedpsds
