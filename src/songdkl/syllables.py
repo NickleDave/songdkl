@@ -101,7 +101,8 @@ def get_all_syls(wav_paths: list[str] | list[pathlib.Path]) -> list[SyllablesFro
 
 
 def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
-                       max_syllables: int | None = None
+                       max_syllables: int | None = None,
+                       psds_per_syl: int = 1,
                        ) -> list[np.ndarray]:
     """Convert syllable segments to power spectral densities (PSDs).
 
@@ -115,6 +116,15 @@ def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
         power spectral densities (PSDs).
         Default is None, in which case PSDs will be computed
         for all syllables.
+    psds_per_syl : int
+        Number of PSDs to compute per syllable. Default is 1.
+        If greater than 1, the segment of audio corresponding
+        to the syllable is split into ``psd_per_syl`` arrays,
+        using the ``numpy.array_split`` function, and a PSD
+        is computed for each of those arrays.
+        Then they are concatenated to produce a single
+        array of features for the syllable,
+        used when computing similarity matrices.
 
     Returns
     -------
@@ -138,8 +148,19 @@ def convert_syl_to_psd(syls_from_wavs: list[SyllablesFromWav],
         nfft = int(round(2 ** 14 / 32000.0 * fs))
         segstart = int(round(600 / (fs / float(nfft))))
         segend = int(round(16000 / (fs / float(nfft))))
-        Pxx, _ = matplotlib.mlab.psd(norm(syl), NFFT=nfft, Fs=fs)
-        spsd = norm(Pxx[segstart:segend])
+        if psds_per_syl > 1:
+            x_for_psd = np.array_split(syl, psds_per_syl)
+        else:
+            x_for_psd = [syl]
+        spsd = []
+        for x in x_for_psd:
+            Pxx, _ = matplotlib.mlab.psd(norm(x), NFFT=nfft, Fs=fs)
+            spsd.append(
+                Pxx[segstart:segend]
+            )
+        spsd = norm(
+            np.concatenate(spsd)
+        )
         return spsd
 
     with dask.diagnostics.progress.ProgressBar():

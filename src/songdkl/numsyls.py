@@ -145,6 +145,7 @@ def numsyls(psds_ref: np.ndarray,
 def numsyls_from_path(ref_path: str | pathlib.Path,
                       max_wavs: int = 120,
                       max_syllables: int = 10000,
+                      psds_per_syl: int = 1,
                       n_basis: int = 50,
                       basis: str = 'first',
                       min_components: int = 2,
@@ -168,6 +169,12 @@ def numsyls_from_path(ref_path: str | pathlib.Path,
     max_syllables : int
         Maximum number of segmented syllables to use when generating
         power spectral densities (PSDs). Default is 10000.
+    psds_per_syl : int
+        Number of PSDs to compute per syllable. Default is 1.
+        If greater than 1, the segment of audio corresponding
+        to the syllable is split into ``psd_per_syl`` arrays,
+        a PSD is computed for each, and they are concatenated
+        to produce a single array of features for the syllable.
     n_basis : int
         Number of syllables to use as basis set. Default is 50.
     basis : str
@@ -211,7 +218,7 @@ def numsyls_from_path(ref_path: str | pathlib.Path,
         msg=f'Getting PSDs from ref_path: {ref_path}',
         level=logging.INFO
     )
-    psds_ref = load_or_prep(ref_path, max_wavs, max_syllables)
+    psds_ref = load_or_prep(ref_path, max_wavs, max_syllables, psds_per_syl)
 
     sylno_bic = numsyls(psds_ref, n_basis, basis, min_components, max_components, n_splits, gmm_kwargs)
     return sylno_bic

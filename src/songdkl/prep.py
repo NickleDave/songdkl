@@ -16,7 +16,9 @@ logger = logging.getLogger(__name__)
 
 def prep(dir_path: str | pathlib.Path,
          max_wavs: int = 120,
-         max_syllables: int = 10000) -> tuple[list[SyllablesFromWav], np.ndarray]:
+         max_syllables: int = 10000,
+         psds_per_syl: int = 1,
+         ) -> tuple[list[SyllablesFromWav], np.ndarray]:
     """Prepare dataset for use with either
     ``songdkl.numsyls`` or ``songdkl.calculate``.
 
@@ -32,10 +34,20 @@ def prep(dir_path: str | pathlib.Path,
     max_syllables : int
         Maximum number of segmented syllables to use when generating
         power spectral densities (PSDs). Default is 10000.
+    psds_per_syl : int
+        Number of PSDs to compute per syllable. Default is 1.
+        If greater than 1, the segment of audio corresponding
+        to the syllable is split into ``psd_per_syl`` arrays,
+        using the ``numpy.array_split`` function, and a PSD
+        is computed for each of those arrays.
+        Then they are concatenated to produce a single
+        array of features for the syllable,
+        used when computing similarity matrices.
     """
     logger.log(
         msg=f'Preparing dataset from dir_path: {dir_path}, '
-            f'with max_wavs={max_wavs} and max_syllables={max_syllables}.',
+            f'with max_wavs={max_wavs}, max_syllables={max_syllables}, '
+            f'and psds_per_syl={psds_per_syl}',
         level=logging.INFO
     )
     dir_path = pathlib.Path(dir_path)
@@ -53,14 +65,15 @@ def prep(dir_path: str | pathlib.Path,
         msg=f'Computing PSDs from syllable segments',
         level=logging.INFO
     )
-    segedpsds = convert_syl_to_psd(syls_from_wavs, max_syllables)
+    segedpsds = convert_syl_to_psd(syls_from_wavs, max_syllables=max_syllables, psds_per_syl=psds_per_syl)
     return syls_from_wavs, np.array(segedpsds)
 
 
 def prep_and_save(dir_path: str | pathlib.Path | list[str | pathlib.Path],
                   output_dir_path: str | pathlib.Path | list[str | pathlib.Path] | None = None,
                   max_wavs: int = 120,
-                  max_syllables: int = 10000) -> None:
+                  max_syllables: int = 10000,
+                  psds_per_syl: int = 1) -> None:
     """Prepare dataset for use with either
     ``songdkl.numsyls`` or ``songdkl.calculate``.
 
@@ -81,6 +94,15 @@ def prep_and_save(dir_path: str | pathlib.Path | list[str | pathlib.Path],
     max_syllables : int
         Maximum number of segmented syllables to use when generating
         power spectral densities (PSDs). Default is 10000.
+    psds_per_syl : int
+        Number of PSDs to compute per syllable. Default is 1.
+        If greater than 1, the segment of audio corresponding
+        to the syllable is split into ``psd_per_syl`` arrays,
+        using the ``numpy.array_split`` function, and a PSD
+        is computed for each of those arrays.
+        Then they are concatenated to produce a single
+        array of features for the syllable,
+        used when computing similarity matrices.
     """
     if isinstance(dir_path, (str, pathlib.Path)):
         dir_path = [dir_path]
@@ -107,7 +129,7 @@ def prep_and_save(dir_path: str | pathlib.Path | list[str | pathlib.Path],
             msg=f'Preparing dataset from dir_path: {a_dir_path}',
             level=logging.INFO
         )
-        syls_from_wavs, segedpsds = prep(a_dir_path, max_wavs, max_syllables)
+        syls_from_wavs, segedpsds = prep(a_dir_path, max_wavs, max_syllables, psds_per_syl)
         logger.log(
             msg=f'Saving syllable segmentation in annotation files: {an_output_dir_path}',
             level=logging.INFO

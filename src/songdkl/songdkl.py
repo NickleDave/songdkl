@@ -175,6 +175,7 @@ def calculate_from_path(ref_path: str | pathlib.Path,
                         k_compare: int,
                         max_wavs: int = 120,
                         max_syllables: int = 10000,
+                        psds_per_syl: int = 1,
                         n_basis: int = 50,
                         basis: str = 'first',
                         gmm_kwargs: DEFAULT_GMM_KWARGS | dict = DEFAULT_GMM_KWARGS
@@ -200,6 +201,12 @@ def calculate_from_path(ref_path: str | pathlib.Path,
     max_syllables : int
         Maximum number of segmented syllables to use when generating
         power spectral densities (PSDs). Default is 10000.
+    psds_per_syl : int
+        Number of PSDs to compute per syllable. Default is 1.
+        If greater than 1, the segment of audio corresponding
+        to the syllable is split into ``psd_per_syl`` arrays,
+        a PSD is computed for each, and they are concatenated
+        to produce a single array of features for the syllable.
     n_basis : int
         Number of syllables to use as basis set. Default is 50.
     basis : str
@@ -240,7 +247,7 @@ def calculate_from_path(ref_path: str | pathlib.Path,
         level=logging.INFO
     )
 
-    segedpsds_ref = load_or_prep(ref_path, max_wavs, max_syllables)
+    segedpsds_ref = load_or_prep(ref_path, max_wavs, max_syllables, psds_per_syl)
 
     logger.log(
         msg=f'Getting PSDs from compare_path: {compare_path}',

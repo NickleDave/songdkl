@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 def load_or_prep(data_path: str | pathlib.Path,
                  max_wavs: int | None = None,
                  max_syllables: int | None = None,
+                 psds_per_syl: int = 1,
                  ) -> np.ndarray:
     """Either load an array of PSDs from a .zarr file,
     or prepare the PSDs from a directory of .wav files.
@@ -32,6 +33,15 @@ def load_or_prep(data_path: str | pathlib.Path,
         Maximum number of segmented syllables to use when generating
         power spectral densities (PSDs).
         Default is None, in which case all are used.
+    psds_per_syl : int
+        Number of PSDs to compute per syllable. Default is 1.
+        If greater than 1, the segment of audio corresponding
+        to the syllable is split into ``psd_per_syl`` arrays,
+        using the ``numpy.array_split`` function, and a PSD
+        is computed for each of those arrays.
+        Then they are concatenated to produce a single
+        array of features for the syllable,
+        used when computing similarity matrices.
 
     Returns
     -------
@@ -50,7 +60,7 @@ def load_or_prep(data_path: str | pathlib.Path,
         segedpsds = load(zarr_path=data_path)
     elif data_path.is_dir():
         # we don't return syls_from_wavs
-        _, segedpsds = prep(data_path, max_wavs, max_syllables)
+        _, segedpsds = prep(data_path, max_wavs, max_syllables, psds_per_syl)
     else:
         raise ValueError(
             f'Not recognized as a .zarr file or a directory: {data_path}'

@@ -49,6 +49,7 @@ def main(argv=None):
                                                                          k_compare=args.k_compare,
                                                                          max_wavs=args.max_wavs,
                                                                          max_syllables=args.max_syllables,
+                                                                         psds_per_syl=args.psds_per_syl,
                                                                          n_basis=args.n_basis,
                                                                          basis=args.basis,
                                                                          gmm_kwargs=gmm_kwargs)
@@ -67,6 +68,7 @@ def main(argv=None):
                                    basis=args.basis,
                                    min_components=args.min_components,
                                    max_components=args.max_components,
+                                   psds_per_syl=args.psds_per_syl,
                                    n_splits=args.n_splits,
                                    gmm_kwargs=gmm_kwargs,
                                    )
