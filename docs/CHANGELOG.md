@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+- Make it easier to rapidly iterate on experiments with Dryad dataset 
+  from Plos Comp. Bio. paper by adding scripts that run `songdkl.prep` 
+  on all the the `song_data` then pack into .tar files, 
+  and a `nox` session that will download all those files off of 
+  [the OSF repo](https://osf.io/wgrzx).
+  [#73](https://github.com/NickleDave/songdkl/pull/73).
+  Fixes [#61](https://github.com/NickleDave/songdkl/issues/61).
+
 ## [0.4.0]
 ### Added
 - Have `prep_and_save` also save the segmentation of .wav files,
