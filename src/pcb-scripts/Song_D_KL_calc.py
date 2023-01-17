@@ -227,6 +227,5 @@ score1 = score1 / len1
 score2 = score2 / len2
 
 # output
-print
-filename1 + '\t' + filename2 + '\t' + str(k) + '\t' + str(k2) + '\t' + str(len2) + '\t' + str(score1) + '\t' + str(
-    score2) + '\t' + str(len(segedpsds1)) + '\t' + str(len(segedpsds2))
+print filename1 + '\t' + filename2 + '\t' + str(k) + '\t' + str(k2) + '\t' + str(len2) + '\t' + str(score1) + '\t' \
+      + str(score2) + '\t' + str(len(segedpsds1)) + '\t' + str(len(segedpsds2))
