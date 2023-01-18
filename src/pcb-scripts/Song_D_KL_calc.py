@@ -1,6 +1,7 @@
 import sys as sys
 import os as os
 
+import joblib
 from mahotas import otsu
 import numpy as np
 from pylab import psd
@@ -225,3 +226,10 @@ score2 = score2 / len2
 # output
 print filename1 + '\t' + filename2 + '\t' + str(k) + '\t' + str(k2) + '\t' + str(len2) + '\t' + str(score1) + '\t' \
       + str(score2) + '\t' + str(len(segedpsds1)) + '\t' + str(len(segedpsds2))
+
+bird1 = filename1.split('/')[-2]  # assumes terminal '/'
+bird2 = filename2.split('/')[-2]  # assumes terminal '/'
+joblib.dump(mod1,
+            './results/fit-models/pcb-script/' + bird1 + '-' + bird2 + '-' + str(k) + '-' + str(k2) + '.mod1.joblib')
+joblib.dump(mod2,
+            './results/fit-models/pcb-script/' + bird1 + '-' + bird2 + '-' + str(k) + '-' + str(k2) + '.mod2.joblib')
