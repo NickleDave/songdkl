@@ -23,7 +23,7 @@ def calculate(psds_ref: np.ndarray,
               n_basis: int = 50,
               basis: str = 'first',
               gmm_kwargs: DEFAULT_GMM_KWARGS | dict = DEFAULT_GMM_KWARGS
-              ) -> Tuple[Union[float, Any], Union[float, Any], int, int]:
+              ) -> tuple[float | Any, float | Any, int, int, GaussianMixture, GaussianMixture]:
     """Calculate :math:`\text{Song }D_{KL}` metric.
 
     Parameters
@@ -70,6 +70,12 @@ def calculate(psds_ref: np.ndarray,
         Number of PSDs used from reference data set.
     n_psd_compare : int
         Number of PDSs used from comparison data set.
+    P : sklearn.mixture.GaussianMixture
+        Model fit to similarity matrix calculated
+        with ``psds_ref``, using ``k_ref`` components.
+    Q : sklearn.mixture.GaussianMixture
+        Model fit to similarity matrix calculated
+        with ``psds_compare``, using ``k_compare`` components.
     """
     if isinstance(gmm_kwargs, DefaultGaussianMixtureKwargs):
         gmm_kwargs = dataclasses.asdict(gmm_kwargs)
@@ -166,7 +172,7 @@ def calculate(psds_ref: np.ndarray,
     n_psds_ref = len(psds_ref)
     n_psds_compare = len(psds_compare)
 
-    return DKL_PQ, DKL_QP, n_psds_ref, n_psds_compare
+    return DKL_PQ, DKL_QP, n_psds_ref, n_psds_compare, P, Q
 
 
 def calculate_from_path(ref_path: str | pathlib.Path,
@@ -178,7 +184,7 @@ def calculate_from_path(ref_path: str | pathlib.Path,
                         n_basis: int = 50,
                         basis: str = 'first',
                         gmm_kwargs: DEFAULT_GMM_KWARGS | dict = DEFAULT_GMM_KWARGS
-                        ) -> Tuple[Union[float, Any], Union[float, Any], int, int]:
+                        ) -> tuple[float | Any, float | Any, int, int, GaussianMixture, GaussianMixture]:
     """Calculate :math:`\text{Song }D_{KL}` metric.
 
     Parameters
@@ -234,6 +240,12 @@ def calculate_from_path(ref_path: str | pathlib.Path,
         Number of PSDs used from reference data set.
     n_psd_compare : int
         Number of PDSs used from comparison data set.
+    P : sklearn.mixture.GaussianMixture
+        Model fit to similarity matrix calculated
+        with ``psds_ref``, using ``k_ref`` components.
+    Q : sklearn.mixture.GaussianMixture
+        Model fit to similarity matrix calculated
+        with ``psds_compare``, using ``k_compare`` components.
     """
     logger.log(
         msg=f'Getting PSDs from ref_path: {ref_path}',
