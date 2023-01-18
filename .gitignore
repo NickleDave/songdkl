@@ -22,6 +22,7 @@ data/pcb_data/
 
 # result
 results/pcb_data/song_data/
+results/fit-models/pcb-script
 
 # test data
 tests/data-for-tests/source/source-test-data.tar.gz
