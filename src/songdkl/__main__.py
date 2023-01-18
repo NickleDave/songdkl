@@ -43,15 +43,15 @@ def main(argv=None):
             gmm_kwargs.update({arg: getattr(args, arg)})
 
     if args.command == 'calculate':
-        score1, score2, n_psds_ref, n_psds_compare = calculate_from_path(ref_path=args.ref_path,
-                                                                         compare_path=args.compare_path,
-                                                                         k_ref=args.k_ref,
-                                                                         k_compare=args.k_compare,
-                                                                         max_wavs=args.max_wavs,
-                                                                         max_num_psds=args.max_num_psds,
-                                                                         n_basis=args.n_basis,
-                                                                         basis=args.basis,
-                                                                         gmm_kwargs=gmm_kwargs)
+        score1, score2, n_psds_ref, n_psds_compare, _, _ = calculate_from_path(ref_path=args.ref_path,
+                                                                               compare_path=args.compare_path,
+                                                                               k_ref=args.k_ref,
+                                                                               k_compare=args.k_compare,
+                                                                               max_wavs=args.max_wavs,
+                                                                               max_num_psds=args.max_num_psds,
+                                                                               n_basis=args.n_basis,
+                                                                               basis=args.basis,
+                                                                               gmm_kwargs=gmm_kwargs)
         print(
             f'{args.ref_path}\t{args.compare_path}\t'
             f'{args.k_ref}\t{args.k_compare}\t'
