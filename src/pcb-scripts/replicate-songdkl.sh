@@ -8,11 +8,24 @@ SCRIPT=src/pcb-scripts/Song_D_KL_calc.py
 SONG_DATA_ROOT=data/pcb_data/song_data/
 OUTPUT=results/replicate-songdkl-pcb-script.txt
 TODO_CSV=src/pcb-scripts/replicate-songdkl-todo.csv
+N_ROWS_TODO=$(wc -l < $TODO_CSV)
 
+while getopts "n:" flag
+do
+    case "${flag}" in
+        n) N_ROWS_TODO=${OPTARG};;
+    esac
+done
+
+n_rows_done=0
 while IFS=, read -r refbird comparebird nsyls1 nsyls2; do
   echo "running: $refbird $comparebird $nsyls1 $nsyls2"
   # NOTE that nsyls1 and nsyls2 will be *the same* and are the number of syllables / components
   # specified for the father's song, as the script says was done for the paper.
   # See the docstring of that script for further detail.
   python $SCRIPT $SONG_DATA_ROOT/$refbird/ $SONG_DATA_ROOT/$comparebird/ $nsyls1 $nsyls2 >> $OUTPUT
+  ((n_rows_done++))
+  if [[ $n_rows_done -eq N_ROWS_TODO ]]; then
+    break
+  fi
 done < $TODO_CSV
