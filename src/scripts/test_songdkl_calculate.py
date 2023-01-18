@@ -4,6 +4,7 @@ import argparse
 import pathlib
 import sys
 
+import joblib
 import pandas as pd
 import songdkl
 
@@ -30,21 +31,36 @@ for col in fath_df.columns:
     fath_df = fath_df.reset_index()
 
 
-def main(n_ref=None):
+SAVE_MODEL_DIR = pathlib.Path('./results/fit-models/songdkl-script/')
+
+
+def main(n=None):
     """pairwise comparison between all birds, using syllable numbers from .csv"""
     records = []
 
+    n_done = 0
     for ref_n, ref in enumerate(fath_df.father.unique()):
-        if n_ref:
-            if ref_n + 1 > n_ref:  # +1 because zero indexing
-                break
         k_ref = int(sylno_df[sylno_df.bird_id == ref].k)
         ref_path = song_data_root / f'{ref}.songdkl.zarr'
 
         for compare in fath_df.son.values:
             k_compare = int(sylno_df[sylno_df.bird_id == compare].k)
             compare_path = song_data_root / f'{compare}.songdkl.zarr'
-            dkl_pq, dkl_qp, n_psds_ref, n_psds_compare = songdkl.songdkl.calculate_from_path(ref_path, compare_path, k_ref, k_ref)
+            (dkl_pq,
+             dkl_qp,
+             n_psds_ref,
+             n_psds_compare,
+             model1,
+             model2) = songdkl.songdkl.calculate_from_path(ref_path,
+                                                           compare_path,
+                                                           k_ref,
+                                                           k_ref)
+
+            joblib.dump(model1,
+                        f'{SAVE_MODEL_DIR}/{ref_path.name}-{compare_path.name}-{k_ref}-{k_ref}.mod1.joblib')
+            joblib.dump(model2,
+                        f'{SAVE_MODEL_DIR}/{ref_path.name}-{compare_path.name}-{k_ref}-{k_ref}.mod2.joblib')
+
             record = {
                 'ref': ref,
                 'compare': compare,
@@ -68,15 +84,23 @@ def main(n_ref=None):
             results_df = pd.DataFrame.from_records(records)
             results_df.to_csv('./results/test-songdkl-calculate.csv', index=False)
 
+            n_done += 1
+            if n:
+                if n_done >= n:
+                    # "return" from main so we don't have to break out of nested for loop
+                    return
+
 
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--n-ref', type=int
+        '-n', type=int,
+        help=('Number of pairwise comparisons to run (out of all possible).'
+              'Provides a way to do short runs of script for testing.')
     )
     return parser
 
 
 parser = get_parser()
 args = parser.parse_args()
-main(n_ref=args.n_ref)
+main(n=args.n)
