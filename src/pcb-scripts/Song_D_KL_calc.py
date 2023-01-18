@@ -1,22 +1,18 @@
 import sys as sys
 import os as os
-import scipy as sc
-from scipy import io
-from scipy.io import wavfile
-from scipy import ndimage
-from scipy import signal
-from scipy import spatial
-from pylab import specgram, psd
-import numpy as np
-import sklearn as skl
-from sklearn import cluster
-from sklearn import metrics
-from scipy import spatial
-from sklearn import mixture
-from sklearn import decomposition
-import random as rnd
-from array import array
+
 from mahotas import otsu
+import numpy as np
+from pylab import psd
+import scipy as sc
+from scipy import (
+    io,
+    ndimage,
+    signal,
+    spatial,
+)
+import scipy.io.wavfile
+from sklearn import mixture
 
 """A script to calculate the song divergence between two birds. It is aplied as follows:
 python Song_D_KL_calc.py folder_with_songs_from_bird_1 folder_with_songs_from_bird_2 number_of_syllable_calsses_bird_1 number_of_syllable_classes_bird_2
